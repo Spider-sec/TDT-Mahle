@@ -2,129 +2,290 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Sistema de Troca de Turno</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Troca de Turno - MAHLE</title>
     <style>
-        body { font-family: Arial, sans-serif; padding: 15px; background: #f4f4f4; }
-        .form-container { background: #fff; padding: 20px; max-width: 900px; margin: 0 auto; border: 1px solid #ccc; }
-        .header-table, .fields-table, .main-table { width: 100%; border-collapse: collapse; }
-        .main-table th, .main-table td { border: 1px solid #000; padding: 4px; }
-        .section-header { background-color: #f2f2f2; text-align: center; font-weight: bold; }
-        input[type="text"], textarea { width: 98%; border: none; font-size: 10pt; font-family: Arial; }
-        input[type="text"]:focus, textarea:focus { outline: 1px solid #0056b3; }
-        .btn-send { background: #0056b3; color: white; padding: 10px 20px; border: none; font-size: 11pt; cursor: pointer; margin-top: 15px; width: 100%; }
-        .btn-send:hover { background: #003d80; }
+        * { box-sizing: border-box; font-family: Arial, sans-serif; }
+        body { background: #eef2f5; margin: 0; padding: 10px; color: #333; }
+        .card { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); max-width: 600px; margin: 0 auto; }
+        
+        .hidden { display: none !important; }
+        .text-center { text-align: center; }
+        .error { color: #d9534f; font-size: 14px; margin-bottom: 10px; text-align: center; font-weight: bold; }
+        .success { color: #5cb85c; font-size: 14px; margin-bottom: 10px; text-align: center; font-weight: bold; }
+        
+        h2 { margin-top: 0; color: #004b87; }
+        .logo-text { font-size: 22pt; font-weight: bold; text-align: right; color: #000; letter-spacing: -1px; margin-bottom: 15px;}
+        
+        label { font-size: 12px; font-weight: bold; color: #555; display: block; margin-top: 10px; margin-bottom: 4px; }
+        input, textarea { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; background: #fdfdfd; }
+        input:focus, textarea:focus { border-color: #004b87; outline: none; }
+        button { width: 100%; padding: 14px; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 20px; }
+        
+        .btn-primary { background: #004b87; color: #fff; }
+        .btn-secondary { background: #6c757d; color: #fff; margin-top: 10px; }
+        .btn-logout { background: #d9534f; color: #fff; }
+        
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .section-title { background: #004b87; color: white; padding: 8px; text-align: center; font-size: 13px; font-weight: bold; border-radius: 4px; margin-top: 20px; margin-bottom: 10px; }
+        
+        .navbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 10px; }
     </style>
 </head>
 <body>
 
-<div class="form-container">
-    <table class="header-table">
-        <tr>
-            <td style="width: 70%; text-align: center; font-size: 14pt; font-weight: bold;">Formulário de Troca de Turno</td>
-            <td style="width: 30%; text-align: right; font-size: 20pt; font-weight: bold;">MAHLE</td>
-        </tr>
-    </table>
+    <!-- TELA DE LOGIN -->
+    <div id="viewLogin" class="card">
+        <div class="logo-text">MAHLE</div>
+        <h2 class="text-center">Acesso Local</h2>
+        <div id="loginMsg"></div>
+        <label>Usuário</label>
+        <input type="text" id="loginUser" placeholder="Digite seu usuário" autocapitalize="none">
+        <label>Senha</label>
+        <input type="password" id="loginPass" placeholder="Sua senha">
+        <button class="btn-primary" onclick="fazerLogin()">Entrar</button>
+    </div>
 
-    <form id="shiftForm">
-        <table class="fields-table" style="margin-top: 15px;">
-            <tr>
-                <td><strong>Data:</strong></td>
-                <td><input type="text" id="data" required></td>
-                <td><strong>Departamento:</strong></td>
-                <td><input type="text" id="departamento" required></td>
-            </tr>
-            <tr>
-                <td><strong>Área de Produção:</strong></td>
-                <td><input type="text" id="areaProducao" required></td>
-                <td><strong>Para (Nome):</strong></td>
-                <td><input type="text" id="paraNome" required></td>
-            </tr>
-            <tr>
-                <td><strong>De (Nome):</strong></td>
-                <td><input type="text" id="deNome" required></td>
-                <td><strong>Para (Turno):</strong></td>
-                <td><input type="text" id="paraTurno" required></td>
-            </tr>
-            <tr>
-                <td><strong>De (Turno):</strong></td>
-                <td><input type="text" id="deTurno" required></td>
-                <td colspan="2"></td>
-            </tr>
-        </table>
+    <!-- TELA DO FORMULÁRIO -->
+    <div id="viewForm" class="card hidden">
+        <div class="navbar">
+            <span id="welcomeText" style="font-weight: bold; color: #004b87;"></span>
+            <div style="display: flex; gap: 5px;">
+                <button id="btnAdmin" class="btn-secondary hidden" style="width: auto; padding: 6px 12px; margin: 0; font-size: 12px;" onclick="toggleView('viewAdmin')">Admin</button>
+                <button class="btn-logout" style="width: auto; padding: 6px 12px; margin: 0; font-size: 12px;" onclick="logout()">Sair</button>
+            </div>
+        </div>
 
-        <table class="main-table" style="margin-top: 15px;">
-            <thead>
-                <tr><th colspan="2" class="section-header">Situação da Produção (Planejado x Realizado / defeito e refugo)</th></tr>
-                <tr><th style="width: 20%;">Linha</th><th style="width: 80%;">Comentários</th></tr>
-            </thead>
-            <tbody>
-                <tr><td><input type="text" name="linha_1"></td><td><input type="text" name="comentario_1"></td></tr>
-                <tr><td><input type="text" name="linha_2"></td><td><input type="text" name="comentario_2"></td></tr>
-                
-                <tr><th colspan="2" class="section-header">Desvios de Processo</th></tr>
-                <tr><td colspan="2"><textarea rows="2" name="desvios"></textarea></td></tr>
+        <div class="logo-text">MAHLE</div>
+        <h2 class="text-center">Troca de Turno</h2>
+        
+        <div class="grid-2">
+            <div><label>Data:</label><input type="date" id="f_data"></div>
+            <div><label>Departamento:</label><input type="text" id="f_depto"></div>
+            <div><label>Área de Produção:</label><input type="text" id="f_area"></div>
+            <div><label>Para (Nome):</label><input type="text" id="f_para_nome"></div>
+            <div><label>De (Nome):</label><input type="text" id="f_de_nome"></div>
+            <div><label>Para (Turno):</label><input type="text" id="f_para_turno"></div>
+            <div><label>De (Turno):</label><input type="text" id="f_de_turno"></div>
+        </div>
 
-                <tr><th colspan="2" class="section-header">Paradas (Quebras / Falta de Material)</th></tr>
-                <tr><td colspan="2"><textarea rows="2" name="paradas"></textarea></td></tr>
+        <div class="section-title">Situação da Produção</div>
+        <div class="grid-2">
+            <input type="text" placeholder="Linha 1" id="f_linha1">
+            <input type="text" placeholder="Comentário" id="f_coment1">
+            <input type="text" placeholder="Linha 2" id="f_linha2">
+            <input type="text" placeholder="Comentário" id="f_coment2">
+            <input type="text" placeholder="Linha 3" id="f_linha3">
+            <input type="text" placeholder="Comentário" id="f_coment3">
+        </div>
 
-                <tr><th colspan="2" class="section-header">Questões trabalhistas</th></tr>
-                <tr><td colspan="2"><textarea rows="2" name="trabalhistas"></textarea></td></tr>
+        <div class="section-title">Desvios de Processo</div>
+        <textarea id="f_desvios" rows="3"></textarea>
 
-                <tr><th colspan="2" class="section-header">TPM / 5S</th></tr>
-                <tr><td colspan="2"><textarea rows="2" name="tpm_5s"></textarea></td></tr>
+        <div class="section-title">Paradas (Quebras / Falta de Material)</div>
+        <textarea id="f_paradas" rows="3"></textarea>
 
-                <tr><th colspan="2" class="section-header">Geral</th></tr>
-                <tr><td colspan="2"><textarea rows="2" name="geral"></textarea></td></tr>
-            </tbody>
-        </table>
+        <div class="section-title">Questões Trabalhistas</div>
+        <textarea id="f_trabalhistas" rows="3"></textarea>
 
-        <button type="submit" class="btn-send">Enviar Relatório</button>
-    </form>
-</div>
+        <div class="section-title">TPM / 5S</div>
+        <textarea id="f_tpm" rows="3"></textarea>
 
-<script>
-    const authToken = localStorage.getItem('token');
-    if (!authToken) {
-        window.location.href = '/login.html'; // Redireciona se não estiver autenticado
-    }
+        <div class="section-title">Geral</div>
+        <textarea id="f_geral" rows="3"></textarea>
 
-    document.getElementById('shiftForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
+        <button class="btn-primary" onclick="enviarRelatorio()">Abrir E-mail com Relatório</button>
+    </div>
 
-        const payload = {
-            data: document.getElementById('data').value,
-            departamento: document.getElementById('departamento').value,
-            areaProducao: document.getElementById('areaProducao').value,
-            deNome: document.getElementById('deNome').value,
-            paraNome: document.getElementById('paraNome').value,
-            deTurno: document.getElementById('deTurno').value,
-            paraTurno: document.getElementById('paraTurno').value,
-            secoes: {
-                desvios: document.querySelector('[name="desvios"]').value,
-                paradas: document.querySelector('[name="paradas"]').value,
-                trabalhistas: document.querySelector('[name="trabalhistas"]').value,
-                tpm_5s: document.querySelector('[name="tpm_5s"]').value,
-                geral: document.querySelector('[name="geral"]').value
+    <!-- TELA ADMIN -->
+    <div id="viewAdmin" class="card hidden">
+        <button class="btn-secondary" style="width: auto; padding: 6px 12px; margin-bottom: 20px; font-size: 12px; margin-top:0;" onclick="toggleView('viewForm')">← Voltar</button>
+        <h2>Painel de Controle</h2>
+        <div id="adminMsg"></div>
+        <label>Nome do Novo Usuário</label>
+        <input type="text" id="newUsername">
+        <label>Senha Provisória</label>
+        <input type="password" id="newPassword">
+        <button class="btn-primary" onclick="criarUsuario()">Criar Acesso</button>
+        <button class="btn-logout" onclick="limparBloqueios()">Destravar Contas Bloqueadas</button>
+    </div>
+
+    <script>
+        async function hashPassword(password) {
+            const msgBuffer = new TextEncoder().encode(password);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        async function initDB() {
+            if (!localStorage.getItem('usersDB')) {
+                const adminHash = await hashPassword('37051064');
+                const initialUsers = [{ username: 'Mizael', password: adminHash, role: 'admin' }];
+                localStorage.setItem('usersDB', JSON.stringify(initialUsers));
+            }
+            if (!localStorage.getItem('loginAttempts')) {
+                localStorage.setItem('loginAttempts', JSON.stringify({}));
+            }
+        }
+
+        function toggleView(viewId) {
+            document.getElementById('viewLogin').classList.add('hidden');
+            document.getElementById('viewForm').classList.add('hidden');
+            document.getElementById('viewAdmin').classList.add('hidden');
+            document.getElementById(viewId).classList.remove('hidden');
+        }
+
+        window.onload = async () => {
+            await initDB();
+            const currentUser = localStorage.getItem('currentUser');
+            const currentRole = localStorage.getItem('currentRole');
+            
+            if (currentUser) {
+                document.getElementById('welcomeText').innerText = `Operador: ${currentUser}`;
+                if (currentRole === 'admin') document.getElementById('btnAdmin').classList.remove('hidden');
+                toggleView('viewForm');
             }
         };
 
-        const response = await fetch('/api/reports/submit', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${authToken}`
-            },
-            body: JSON.stringify(payload)
-        });
+        async function fazerLogin() {
+            const user = document.getElementById('loginUser').value.trim();
+            const pass = document.getElementById('loginPass').value;
+            const msg = document.getElementById('loginMsg');
+            
+            if (!user || !pass) {
+                msg.innerText = "Preencha usuário e senha.";
+                msg.className = "error";
+                return;
+            }
 
-        const result = await response.json();
-        if (response.ok) {
-            alert('Relatório enviado com sucesso!');
-        } else {
-            alert('Erro ao enviar relatório: ' + result.error);
+            let attemptsDB = JSON.parse(localStorage.getItem('loginAttempts'));
+            const userAttempts = attemptsDB[user] || { count: 0, lockedUntil: 0 };
+
+            if (Date.now() < userAttempts.lockedUntil) {
+                const minutesLeft = Math.ceil((userAttempts.lockedUntil - Date.now()) / 60000);
+                msg.innerText = `Conta bloqueada. Tente novamente em ${minutesLeft} minutos.`;
+                msg.className = "error";
+                return;
+            }
+
+            const users = JSON.parse(localStorage.getItem('usersDB'));
+            const foundUser = users.find(u => u.username.toLowerCase() === user.toLowerCase());
+
+            if (foundUser) {
+                const hashedInput = await hashPassword(pass);
+                if (foundUser.password === hashedInput) {
+                    userAttempts.count = 0;
+                    attemptsDB[user] = userAttempts;
+                    localStorage.setItem('loginAttempts', JSON.stringify(attemptsDB));
+                    
+                    localStorage.setItem('currentUser', foundUser.username);
+                    localStorage.setItem('currentRole', foundUser.role);
+                    window.location.reload();
+                    return;
+                }
+            }
+
+            userAttempts.count += 1;
+            if (userAttempts.count >= 8) {
+                userAttempts.lockedUntil = Date.now() + (15 * 60 * 1000); 
+                msg.innerText = "8 tentativas falhas. Conta bloqueada por 15 minutos.";
+            } else {
+                msg.innerText = `Usuário ou senha incorretos. Tentativa ${userAttempts.count} de 8.`;
+            }
+            attemptsDB[user] = userAttempts;
+            localStorage.setItem('loginAttempts', JSON.stringify(attemptsDB));
+            msg.className = "error";
         }
-    });
-</script>
 
+        async function criarUsuario() {
+            const newUser = document.getElementById('newUsername').value.trim();
+            const newPass = document.getElementById('newPassword').value;
+            const msg = document.getElementById('adminMsg');
+
+            if (newUser === '' || newPass === '') {
+                msg.innerText = "Preencha todos os campos.";
+                msg.className = "error";
+                return;
+            }
+
+            let users = JSON.parse(localStorage.getItem('usersDB'));
+            if (users.find(u => u.username.toLowerCase() === newUser.toLowerCase())) {
+                msg.innerText = "Usuário já existe no aparelho.";
+                msg.className = "error";
+                return;
+            }
+
+            const hashedPass = await hashPassword(newPass);
+            users.push({ username: newUser, password: hashedPass, role: 'operator' });
+            localStorage.setItem('usersDB', JSON.stringify(users));
+
+            msg.innerText = `Usuário ${newUser} cadastrado com sucesso!`;
+            msg.className = "success";
+            document.getElementById('newUsername').value = '';
+            document.getElementById('newPassword').value = '';
+        }
+
+        function limparBloqueios() {
+            localStorage.setItem('loginAttempts', JSON.stringify({}));
+            const msg = document.getElementById('adminMsg');
+            msg.innerText = "Todos os bloqueios de tentativas foram resetados.";
+            msg.className = "success";
+        }
+
+        function enviarRelatorio() {
+            const data = document.getElementById('f_data').value;
+            const depto = document.getElementById('f_depto').value;
+            const area = document.getElementById('f_area').value;
+            const de_nome = document.getElementById('f_de_nome').value;
+            const para_nome = document.getElementById('f_para_nome').value;
+            const de_turno = document.getElementById('f_de_turno').value;
+            const para_turno = document.getElementById('f_para_turno').value;
+            
+            const emailDestino = "supervisao@mahle.com"; 
+            const assunto = `Relatório de Troca de Turno - ${data}`;
+            
+            const corpo = `
+FORMULÁRIO DE TROCA DE TURNO - MAHLE
+------------------------------------
+Data: ${data} | Depto: ${depto}
+Área de Produção: ${area}
+De (Nome): ${de_nome} | De (Turno): ${de_turno}
+Para (Nome): ${para_nome} | Para (Turno): ${para_turno}
+
+1. SITUAÇÃO DA PRODUÇÃO
+Linha: ${document.getElementById('f_linha1').value} | Comentário: ${document.getElementById('f_coment1').value}
+Linha: ${document.getElementById('f_linha2').value} | Comentário: ${document.getElementById('f_coment2').value}
+Linha: ${document.getElementById('f_linha3').value} | Comentário: ${document.getElementById('f_coment3').value}
+
+2. DESVIOS DE PROCESSO
+${document.getElementById('f_desvios').value}
+
+3. PARADAS (Quebras / Falta de Material)
+${document.getElementById('f_paradas').value}
+
+4. QUESTÕES TRABALHISTAS
+${document.getElementById('f_trabalhistas').value}
+
+5. TPM / 5S
+${document.getElementById('f_tpm').value}
+
+6. GERAL
+${document.getElementById('f_geral').value}
+
+------------------------------------
+Preenchido via Sistema Mobile Local por: ${localStorage.getItem('currentUser')}
+            `;
+
+            const link = `mailto:${emailDestino}?subject=${encodeURIComponent(assunto)}&body=${encodeURIComponent(corpo.trim())}`;
+            window.location.href = link;
+        }
+
+        function logout() {
+            localStorage.removeItem('currentUser');
+            localStorage.removeItem('currentRole');
+            window.location.reload();
+        }
+    </script>
 </body>
 </html>
