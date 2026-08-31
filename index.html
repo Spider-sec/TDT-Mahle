@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Sistema de Troca de Turno</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 15px; background: #f4f4f4; }
+        .form-container { background: #fff; padding: 20px; max-width: 900px; margin: 0 auto; border: 1px solid #ccc; }
+        .header-table, .fields-table, .main-table { width: 100%; border-collapse: collapse; }
+        .main-table th, .main-table td { border: 1px solid #000; padding: 4px; }
+        .section-header { background-color: #f2f2f2; text-align: center; font-weight: bold; }
+        input[type="text"], textarea { width: 98%; border: none; font-size: 10pt; font-family: Arial; }
+        input[type="text"]:focus, textarea:focus { outline: 1px solid #0056b3; }
+        .btn-send { background: #0056b3; color: white; padding: 10px 20px; border: none; font-size: 11pt; cursor: pointer; margin-top: 15px; width: 100%; }
+        .btn-send:hover { background: #003d80; }
+    </style>
+</head>
+<body>
+
+<div class="form-container">
+    <table class="header-table">
+        <tr>
+            <td style="width: 70%; text-align: center; font-size: 14pt; font-weight: bold;">Formulário de Troca de Turno</td>
+            <td style="width: 30%; text-align: right; font-size: 20pt; font-weight: bold;">MAHLE</td>
+        </tr>
+    </table>
+
+    <form id="shiftForm">
+        <table class="fields-table" style="margin-top: 15px;">
+            <tr>
+                <td><strong>Data:</strong></td>
+                <td><input type="text" id="data" required></td>
+                <td><strong>Departamento:</strong></td>
+                <td><input type="text" id="departamento" required></td>
+            </tr>
+            <tr>
+                <td><strong>Área de Produção:</strong></td>
+                <td><input type="text" id="areaProducao" required></td>
+                <td><strong>Para (Nome):</strong></td>
+                <td><input type="text" id="paraNome" required></td>
+            </tr>
+            <tr>
+                <td><strong>De (Nome):</strong></td>
+                <td><input type="text" id="deNome" required></td>
+                <td><strong>Para (Turno):</strong></td>
+                <td><input type="text" id="paraTurno" required></td>
+            </tr>
+            <tr>
+                <td><strong>De (Turno):</strong></td>
+                <td><input type="text" id="deTurno" required></td>
+                <td colspan="2"></td>
+            </tr>
+        </table>
+
+        <table class="main-table" style="margin-top: 15px;">
+            <thead>
+                <tr><th colspan="2" class="section-header">Situação da Produção (Planejado x Realizado / defeito e refugo)</th></tr>
+                <tr><th style="width: 20%;">Linha</th><th style="width: 80%;">Comentários</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><input type="text" name="linha_1"></td><td><input type="text" name="comentario_1"></td></tr>
+                <tr><td><input type="text" name="linha_2"></td><td><input type="text" name="comentario_2"></td></tr>
+                
+                <tr><th colspan="2" class="section-header">Desvios de Processo</th></tr>
+                <tr><td colspan="2"><textarea rows="2" name="desvios"></textarea></td></tr>
+
+                <tr><th colspan="2" class="section-header">Paradas (Quebras / Falta de Material)</th></tr>
+                <tr><td colspan="2"><textarea rows="2" name="paradas"></textarea></td></tr>
+
+                <tr><th colspan="2" class="section-header">Questões trabalhistas</th></tr>
+                <tr><td colspan="2"><textarea rows="2" name="trabalhistas"></textarea></td></tr>
+
+                <tr><th colspan="2" class="section-header">TPM / 5S</th></tr>
+                <tr><td colspan="2"><textarea rows="2" name="tpm_5s"></textarea></td></tr>
+
+                <tr><th colspan="2" class="section-header">Geral</th></tr>
+                <tr><td colspan="2"><textarea rows="2" name="geral"></textarea></td></tr>
+            </tbody>
+        </table>
+
+        <button type="submit" class="btn-send">Enviar Relatório</button>
+    </form>
+</div>
+
+<script>
+    const authToken = localStorage.getItem('token');
+    if (!authToken) {
+        window.location.href = '/login.html'; // Redireciona se não estiver autenticado
+    }
+
+    document.getElementById('shiftForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const payload = {
+            data: document.getElementById('data').value,
+            departamento: document.getElementById('departamento').value,
+            areaProducao: document.getElementById('areaProducao').value,
+            deNome: document.getElementById('deNome').value,
+            paraNome: document.getElementById('paraNome').value,
+            deTurno: document.getElementById('deTurno').value,
+            paraTurno: document.getElementById('paraTurno').value,
+            secoes: {
+                desvios: document.querySelector('[name="desvios"]').value,
+                paradas: document.querySelector('[name="paradas"]').value,
+                trabalhistas: document.querySelector('[name="trabalhistas"]').value,
+                tpm_5s: document.querySelector('[name="tpm_5s"]').value,
+                geral: document.querySelector('[name="geral"]').value
+            }
+        };
+
+        const response = await fetch('/api/reports/submit', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${authToken}`
+            },
+            body: JSON.stringify(payload)
+        });
+
+        const result = await response.json();
+        if (response.ok) {
+            alert('Relatório enviado com sucesso!');
+        } else {
+            alert('Erro ao enviar relatório: ' + result.error);
+        }
+    });
+</script>
+
+</body>
+</html>
