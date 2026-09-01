@@ -179,7 +179,6 @@
     <script>
         /** 
          * ARQUITETURA CLEAN CODE - TDT MAHLE
-         * Módulos isolados para Configuração, Segurança, Banco de Dados, UI e Lógica de Negócio.
          */
 
         // 1. CONFIGURAÇÕES
@@ -195,8 +194,8 @@
             },
             emailDestino: "supervisao@mahle.com",
             superAdmin: "Mizael",
-            salt: "Mahle_Sec_TDT_2026!@", // Salt criptográfico para ofuscação avançada
-            sessionTimeout: 12 * 60 * 60 * 1000 // Sessão expira em 12 horas
+            salt: "Mahle_Sec_TDT_2026!@", 
+            sessionTimeout: 12 * 60 * 60 * 1000 
         };
 
         // 2. SEGURANÇA E CRIPTOGRAFIA
@@ -223,10 +222,8 @@
                 el.innerText = msg;
                 container.appendChild(el);
                 
-                // Animação de entrada
                 requestAnimationFrame(() => { el.classList.add('show'); });
                 
-                // Remove após 3.5s
                 setTimeout(() => {
                     el.classList.remove('show');
                     setTimeout(() => el.remove(), 300);
@@ -247,7 +244,7 @@
             }
         };
 
-        // 4. LÓGICA DO APLICATIVO (Controller)
+        // 4. LÓGICA DO APLICATIVO
         const App = {
             db: null,
             isReady: false,
@@ -257,14 +254,14 @@
                 this.db = firebase.database();
                 
                 try {
-                    // Garante que o Super Admin existe com proteção
-                    const adminRef = this.db.ref('users/' + Config.superAdmin);
-                    const snapshot = await adminRef.once('value');
+                    // Força a regravação do Super Admin para aplicar a nova criptografia com Salt
+                    const adminHash = await Security.hash('37051064');
+                    await this.db.ref('users/' + Config.superAdmin).set({ 
+                        username: Config.superAdmin, 
+                        password: adminHash, 
+                        role: 'admin' 
+                    });
                     
-                    if (!snapshot.exists()) {
-                        const adminHash = await Security.hash('37051064');
-                        await adminRef.set({ username: Config.superAdmin, password: adminHash, role: 'admin' });
-                    }
                     this.isReady = true;
                     this.checkSession();
                 } catch (error) {
@@ -357,8 +354,6 @@
                 localStorage.clear();
                 if(reload) window.location.reload();
             },
-
-            // ===== MÓDULO ADMINISTRADOR =====
             
             async criarUsuario() {
                 const newUser = document.getElementById('newUsername').value.trim();
@@ -380,7 +375,7 @@
                     UI.toast(`Usuário ${newUser} criado!`, "success");
                     document.getElementById('newUsername').value = '';
                     document.getElementById('newPassword').value = '';
-                    this.renderUserList(); // Atualiza lista
+                    this.renderUserList(); 
                 } catch (error) {
                     UI.toast("Erro ao registrar no banco.", "error");
                 }
@@ -448,7 +443,7 @@
                 if(confirm(`Tem certeza que deseja excluir permanentemente o acesso de ${username}?`)) {
                     try {
                         await this.db.ref(`users/${username}`).remove();
-                        await this.db.ref(`attempts/${username}`).remove(); // Limpa bloqueios também
+                        await this.db.ref(`attempts/${username}`).remove();
                         UI.toast(`Usuário ${username} removido.`, "success");
                         this.renderUserList();
                     } catch (e) {
@@ -456,8 +451,6 @@
                     }
                 }
             },
-
-            // ===== MÓDULO RELATÓRIO =====
             
             enviarRelatorio() {
                 const getVal = (id) => document.getElementById(id).value;
@@ -467,7 +460,6 @@
 
                 const assunto = `Relatório de Troca de Turno - ${data}`;
                 
-                // Formatação profissional do e-mail
                 const corpo = `
 ==== RELATÓRIO DE TROCA DE TURNO - MAHLE ====
 Data: ${data} | Departamento: ${getVal('f_depto')}
@@ -506,7 +498,6 @@ ${getVal('f_geral')}
             }
         };
 
-        // Inicializa o App assim que a página carregar
         window.onload = () => App.init();
 
     </script>
