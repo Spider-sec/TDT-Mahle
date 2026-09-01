@@ -116,17 +116,16 @@
     </div>
 
     <script>
-        // -------------------------------------------------------------
-        // COLOQUE AQUI AS CREDENCIAIS DO SEU FIREBASE (PASSO 2 ABAIXO)
-        // -------------------------------------------------------------
+        // Credenciais do Firebase atualizadas
         const firebaseConfig = {
-            apiKey: "SUA_API_KEY",
-            authDomain: "SEU_PROJETO.firebaseapp.com",
-            databaseURL: "https://SEU_PROJETO-default-rtdb.firebaseio.com",
-            projectId: "SEU_PROJETO",
-            storageBucket: "SEU_PROJETO.appspot.com",
-            messagingSenderId: "SEU_SENDER_ID",
-            appId: "SEU_APP_ID"
+            apiKey: "AIzaSyARfglCAGb4ITePr4ede_jBaTJpTEHrxnk",
+            authDomain: "tdt-mahle.firebaseapp.com",
+            databaseURL: "https://tdt-mahle-default-rtdb.firebaseio.com",
+            projectId: "tdt-mahle",
+            storageBucket: "tdt-mahle.firebasestorage.app",
+            messagingSenderId: "802974828568",
+            appId: "1:802974828568:web:84f6a42464159574d65b6d",
+            measurementId: "G-N3SWMX7MRG"
         };
         
         // Inicializa o Firebase
@@ -141,7 +140,7 @@
             return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
         }
 
-        // Verifica e cria o admin (Mizael) no servidor da nuvem, se não existir
+        // Verifica e cria o admin no banco da nuvem
         db.ref('users/Mizael').once('value', async (snapshot) => {
             if (!snapshot.exists()) {
                 const adminHash = await hashPassword('37051064');
@@ -163,7 +162,6 @@
         }
 
         window.onload = () => {
-            // Mantém a sessão ativa usando o aparelho do usuário atual
             const currentUser = localStorage.getItem('currentUser');
             const currentRole = localStorage.getItem('currentRole');
             
@@ -186,7 +184,6 @@
 
             msg.innerText = "Autenticando..."; msg.className = "";
 
-            // Consulta bloqueios na nuvem
             const attemptRef = db.ref('attempts/' + user);
             const attemptSnap = await attemptRef.once('value');
             let userAttempts = attemptSnap.exists() ? attemptSnap.val() : { count: 0, lockedUntil: 0 };
@@ -196,7 +193,6 @@
                 msg.innerText = `Conta bloqueada. Tente em ${minutesLeft} minutos.`; msg.className = "error"; return;
             }
 
-            // Consulta usuário na nuvem
             const userSnap = await db.ref('users/' + user).once('value');
             
             if (userSnap.exists()) {
@@ -204,8 +200,7 @@
                 const hashedInput = await hashPassword(pass);
                 
                 if (foundUser.password === hashedInput) {
-                    // Login Sucesso
-                    await attemptRef.set({ count: 0, lockedUntil: 0 }); // Reseta bloqueios
+                    await attemptRef.set({ count: 0, lockedUntil: 0 }); 
                     localStorage.setItem('currentUser', foundUser.username);
                     localStorage.setItem('currentRole', foundUser.role);
                     window.location.reload();
@@ -213,7 +208,6 @@
                 }
             }
 
-            // Login Falhou
             userAttempts.count += 1;
             if (userAttempts.count >= 8) {
                 userAttempts.lockedUntil = Date.now() + (15 * 60 * 1000); 
