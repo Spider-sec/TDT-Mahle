@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Troca de Turno - MAHLE</title>
+    
+    <!-- Bibliotecas do Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
     <style>
         * { box-sizing: border-box; font-family: Arial, sans-serif; }
         body { background: #eef2f5; margin: 0; padding: 10px; color: #333; }
@@ -37,8 +42,8 @@
     <!-- TELA DE LOGIN -->
     <div id="viewLogin" class="card">
         <div class="logo-text">MAHLE</div>
-        <h2 class="text-center">Acesso Local</h2>
-        <div id="loginMsg"></div>
+        <h2 class="text-center">Acesso ao Sistema</h2>
+        <div id="loginMsg">Carregando banco de dados...</div>
         <label>Usuário</label>
         <input type="text" id="loginUser" placeholder="Digite seu usuário" autocapitalize="none">
         <label>Senha</label>
@@ -111,6 +116,24 @@
     </div>
 
     <script>
+        // -------------------------------------------------------------
+        // COLOQUE AQUI AS CREDENCIAIS DO SEU FIREBASE (PASSO 2 ABAIXO)
+        // -------------------------------------------------------------
+        const firebaseConfig = {
+            apiKey: "SUA_API_KEY",
+            authDomain: "SEU_PROJETO.firebaseapp.com",
+            databaseURL: "https://SEU_PROJETO-default-rtdb.firebaseio.com",
+            projectId: "SEU_PROJETO",
+            storageBucket: "SEU_PROJETO.appspot.com",
+            messagingSenderId: "SEU_SENDER_ID",
+            appId: "SEU_APP_ID"
+        };
+        
+        // Inicializa o Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        let dbPronto = false;
+
         async function hashPassword(password) {
             const msgBuffer = new TextEncoder().encode(password);
             const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
@@ -118,16 +141,19 @@
             return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
         }
 
-        async function initDB() {
-            if (!localStorage.getItem('usersDB')) {
+        // Verifica e cria o admin (Mizael) no servidor da nuvem, se não existir
+        db.ref('users/Mizael').once('value', async (snapshot) => {
+            if (!snapshot.exists()) {
                 const adminHash = await hashPassword('37051064');
-                const initialUsers = [{ username: 'Mizael', password: adminHash, role: 'admin' }];
-                localStorage.setItem('usersDB', JSON.stringify(initialUsers));
+                await db.ref('users/Mizael').set({
+                    username: 'Mizael',
+                    password: adminHash,
+                    role: 'admin'
+                });
             }
-            if (!localStorage.getItem('loginAttempts')) {
-                localStorage.setItem('loginAttempts', JSON.stringify({}));
-            }
-        }
+            dbPronto = true;
+            document.getElementById('loginMsg').innerText = "";
+        });
 
         function toggleView(viewId) {
             document.getElementById('viewLogin').classList.add('hidden');
@@ -136,8 +162,8 @@
             document.getElementById(viewId).classList.remove('hidden');
         }
 
-        window.onload = async () => {
-            await initDB();
+        window.onload = () => {
+            // Mantém a sessão ativa usando o aparelho do usuário atual
             const currentUser = localStorage.getItem('currentUser');
             const currentRole = localStorage.getItem('currentRole');
             
@@ -149,36 +175,37 @@
         };
 
         async function fazerLogin() {
+            if (!dbPronto) return;
             const user = document.getElementById('loginUser').value.trim();
             const pass = document.getElementById('loginPass').value;
             const msg = document.getElementById('loginMsg');
             
             if (!user || !pass) {
-                msg.innerText = "Preencha usuário e senha.";
-                msg.className = "error";
-                return;
+                msg.innerText = "Preencha usuário e senha."; msg.className = "error"; return;
             }
 
-            let attemptsDB = JSON.parse(localStorage.getItem('loginAttempts'));
-            const userAttempts = attemptsDB[user] || { count: 0, lockedUntil: 0 };
+            msg.innerText = "Autenticando..."; msg.className = "";
+
+            // Consulta bloqueios na nuvem
+            const attemptRef = db.ref('attempts/' + user);
+            const attemptSnap = await attemptRef.once('value');
+            let userAttempts = attemptSnap.exists() ? attemptSnap.val() : { count: 0, lockedUntil: 0 };
 
             if (Date.now() < userAttempts.lockedUntil) {
                 const minutesLeft = Math.ceil((userAttempts.lockedUntil - Date.now()) / 60000);
-                msg.innerText = `Conta bloqueada. Tente novamente em ${minutesLeft} minutos.`;
-                msg.className = "error";
-                return;
+                msg.innerText = `Conta bloqueada. Tente em ${minutesLeft} minutos.`; msg.className = "error"; return;
             }
 
-            const users = JSON.parse(localStorage.getItem('usersDB'));
-            const foundUser = users.find(u => u.username.toLowerCase() === user.toLowerCase());
-
-            if (foundUser) {
+            // Consulta usuário na nuvem
+            const userSnap = await db.ref('users/' + user).once('value');
+            
+            if (userSnap.exists()) {
+                const foundUser = userSnap.val();
                 const hashedInput = await hashPassword(pass);
+                
                 if (foundUser.password === hashedInput) {
-                    userAttempts.count = 0;
-                    attemptsDB[user] = userAttempts;
-                    localStorage.setItem('loginAttempts', JSON.stringify(attemptsDB));
-                    
+                    // Login Sucesso
+                    await attemptRef.set({ count: 0, lockedUntil: 0 }); // Reseta bloqueios
                     localStorage.setItem('currentUser', foundUser.username);
                     localStorage.setItem('currentRole', foundUser.role);
                     window.location.reload();
@@ -186,6 +213,7 @@
                 }
             }
 
+            // Login Falhou
             userAttempts.count += 1;
             if (userAttempts.count >= 8) {
                 userAttempts.lockedUntil = Date.now() + (15 * 60 * 1000); 
@@ -193,8 +221,7 @@
             } else {
                 msg.innerText = `Usuário ou senha incorretos. Tentativa ${userAttempts.count} de 8.`;
             }
-            attemptsDB[user] = userAttempts;
-            localStorage.setItem('loginAttempts', JSON.stringify(attemptsDB));
+            await attemptRef.set(userAttempts);
             msg.className = "error";
         }
 
@@ -204,21 +231,22 @@
             const msg = document.getElementById('adminMsg');
 
             if (newUser === '' || newPass === '') {
-                msg.innerText = "Preencha todos os campos.";
-                msg.className = "error";
-                return;
+                msg.innerText = "Preencha todos os campos."; msg.className = "error"; return;
             }
 
-            let users = JSON.parse(localStorage.getItem('usersDB'));
-            if (users.find(u => u.username.toLowerCase() === newUser.toLowerCase())) {
-                msg.innerText = "Usuário já existe no aparelho.";
-                msg.className = "error";
-                return;
+            msg.innerText = "Criando..."; msg.className = "";
+
+            const userSnap = await db.ref('users/' + newUser).once('value');
+            if (userSnap.exists()) {
+                msg.innerText = "Esse usuário já existe na base."; msg.className = "error"; return;
             }
 
             const hashedPass = await hashPassword(newPass);
-            users.push({ username: newUser, password: hashedPass, role: 'operator' });
-            localStorage.setItem('usersDB', JSON.stringify(users));
+            await db.ref('users/' + newUser).set({
+                username: newUser,
+                password: hashedPass,
+                role: 'operator'
+            });
 
             msg.innerText = `Usuário ${newUser} cadastrado com sucesso!`;
             msg.className = "success";
@@ -226,10 +254,10 @@
             document.getElementById('newPassword').value = '';
         }
 
-        function limparBloqueios() {
-            localStorage.setItem('loginAttempts', JSON.stringify({}));
+        async function limparBloqueios() {
+            await db.ref('attempts').remove();
             const msg = document.getElementById('adminMsg');
-            msg.innerText = "Todos os bloqueios de tentativas foram resetados.";
+            msg.innerText = "Todos os bloqueios de todas as contas foram destravados.";
             msg.className = "success";
         }
 
@@ -274,7 +302,7 @@ ${document.getElementById('f_tpm').value}
 ${document.getElementById('f_geral').value}
 
 ------------------------------------
-Preenchido via Sistema Mobile Local por: ${localStorage.getItem('currentUser')}
+Preenchido via Sistema Mobile por: ${localStorage.getItem('currentUser')}
             `;
 
             const link = `mailto:${emailDestino}?subject=${encodeURIComponent(assunto)}&body=${encodeURIComponent(corpo.trim())}`;
