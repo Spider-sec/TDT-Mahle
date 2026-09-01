@@ -116,7 +116,7 @@
     </div>
 
     <script>
-        // Credenciais do Firebase atualizadas
+        // Credenciais do Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyARfglCAGb4ITePr4ede_jBaTJpTEHrxnk",
             authDomain: "tdt-mahle.firebaseapp.com",
@@ -140,19 +140,24 @@
             return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
         }
 
-        // Verifica e cria o admin no banco da nuvem
-        db.ref('users/Mizael').once('value', async (snapshot) => {
-            if (!snapshot.exists()) {
-                const adminHash = await hashPassword('37051064');
-                await db.ref('users/Mizael').set({
-                    username: 'Mizael',
-                    password: adminHash,
-                    role: 'admin'
-                });
-            }
-            dbPronto = true;
-            document.getElementById('loginMsg').innerText = "";
-        });
+        // Verifica e cria o admin no banco da nuvem (COM TRATAMENTO DE ERRO)
+        db.ref('users/Mizael').once('value')
+            .then(async (snapshot) => {
+                if (!snapshot.exists()) {
+                    const adminHash = await hashPassword('37051064');
+                    await db.ref('users/Mizael').set({
+                        username: 'Mizael',
+                        password: adminHash,
+                        role: 'admin'
+                    });
+                }
+                dbPronto = true;
+                document.getElementById('loginMsg').innerText = "";
+            })
+            .catch((error) => {
+                document.getElementById('loginMsg').innerHTML = `<span style="color:red; font-weight:bold;">Erro de Conexão: ${error.message}</span>`;
+                console.error("Erro Firebase:", error);
+            });
 
         function toggleView(viewId) {
             document.getElementById('viewLogin').classList.add('hidden');
@@ -173,7 +178,10 @@
         };
 
         async function fazerLogin() {
-            if (!dbPronto) return;
+            if (!dbPronto) {
+                document.getElementById('loginMsg').innerText = "Aguarde a conexão com o banco...";
+                return;
+            }
             const user = document.getElementById('loginUser').value.trim();
             const pass = document.getElementById('loginPass').value;
             const msg = document.getElementById('loginMsg');
@@ -184,39 +192,44 @@
 
             msg.innerText = "Autenticando..."; msg.className = "";
 
-            const attemptRef = db.ref('attempts/' + user);
-            const attemptSnap = await attemptRef.once('value');
-            let userAttempts = attemptSnap.exists() ? attemptSnap.val() : { count: 0, lockedUntil: 0 };
+            try {
+                const attemptRef = db.ref('attempts/' + user);
+                const attemptSnap = await attemptRef.once('value');
+                let userAttempts = attemptSnap.exists() ? attemptSnap.val() : { count: 0, lockedUntil: 0 };
 
-            if (Date.now() < userAttempts.lockedUntil) {
-                const minutesLeft = Math.ceil((userAttempts.lockedUntil - Date.now()) / 60000);
-                msg.innerText = `Conta bloqueada. Tente em ${minutesLeft} minutos.`; msg.className = "error"; return;
-            }
-
-            const userSnap = await db.ref('users/' + user).once('value');
-            
-            if (userSnap.exists()) {
-                const foundUser = userSnap.val();
-                const hashedInput = await hashPassword(pass);
-                
-                if (foundUser.password === hashedInput) {
-                    await attemptRef.set({ count: 0, lockedUntil: 0 }); 
-                    localStorage.setItem('currentUser', foundUser.username);
-                    localStorage.setItem('currentRole', foundUser.role);
-                    window.location.reload();
-                    return;
+                if (Date.now() < userAttempts.lockedUntil) {
+                    const minutesLeft = Math.ceil((userAttempts.lockedUntil - Date.now()) / 60000);
+                    msg.innerText = `Conta bloqueada. Tente em ${minutesLeft} minutos.`; msg.className = "error"; return;
                 }
-            }
 
-            userAttempts.count += 1;
-            if (userAttempts.count >= 8) {
-                userAttempts.lockedUntil = Date.now() + (15 * 60 * 1000); 
-                msg.innerText = "8 tentativas falhas. Conta bloqueada por 15 minutos.";
-            } else {
-                msg.innerText = `Usuário ou senha incorretos. Tentativa ${userAttempts.count} de 8.`;
+                const userSnap = await db.ref('users/' + user).once('value');
+                
+                if (userSnap.exists()) {
+                    const foundUser = userSnap.val();
+                    const hashedInput = await hashPassword(pass);
+                    
+                    if (foundUser.password === hashedInput) {
+                        await attemptRef.set({ count: 0, lockedUntil: 0 }); 
+                        localStorage.setItem('currentUser', foundUser.username);
+                        localStorage.setItem('currentRole', foundUser.role);
+                        window.location.reload();
+                        return;
+                    }
+                }
+
+                userAttempts.count += 1;
+                if (userAttempts.count >= 8) {
+                    userAttempts.lockedUntil = Date.now() + (15 * 60 * 1000); 
+                    msg.innerText = "8 tentativas falhas. Conta bloqueada por 15 minutos.";
+                } else {
+                    msg.innerText = `Usuário ou senha incorretos. Tentativa ${userAttempts.count} de 8.`;
+                }
+                await attemptRef.set(userAttempts);
+                msg.className = "error";
+            } catch (error) {
+                msg.innerText = "Erro ao acessar o banco. Verifique as regras do Firebase.";
+                msg.className = "error";
             }
-            await attemptRef.set(userAttempts);
-            msg.className = "error";
         }
 
         async function criarUsuario() {
@@ -230,29 +243,40 @@
 
             msg.innerText = "Criando..."; msg.className = "";
 
-            const userSnap = await db.ref('users/' + newUser).once('value');
-            if (userSnap.exists()) {
-                msg.innerText = "Esse usuário já existe na base."; msg.className = "error"; return;
+            try {
+                const userSnap = await db.ref('users/' + newUser).once('value');
+                if (userSnap.exists()) {
+                    msg.innerText = "Esse usuário já existe na base."; msg.className = "error"; return;
+                }
+
+                const hashedPass = await hashPassword(newPass);
+                await db.ref('users/' + newUser).set({
+                    username: newUser,
+                    password: hashedPass,
+                    role: 'operator'
+                });
+
+                msg.innerText = `Usuário ${newUser} cadastrado com sucesso!`;
+                msg.className = "success";
+                document.getElementById('newUsername').value = '';
+                document.getElementById('newPassword').value = '';
+            } catch (error) {
+                msg.innerText = "Erro ao criar. Verifique permissões do Firebase.";
+                msg.className = "error";
             }
-
-            const hashedPass = await hashPassword(newPass);
-            await db.ref('users/' + newUser).set({
-                username: newUser,
-                password: hashedPass,
-                role: 'operator'
-            });
-
-            msg.innerText = `Usuário ${newUser} cadastrado com sucesso!`;
-            msg.className = "success";
-            document.getElementById('newUsername').value = '';
-            document.getElementById('newPassword').value = '';
         }
 
         async function limparBloqueios() {
-            await db.ref('attempts').remove();
-            const msg = document.getElementById('adminMsg');
-            msg.innerText = "Todos os bloqueios de todas as contas foram destravados.";
-            msg.className = "success";
+            try {
+                await db.ref('attempts').remove();
+                const msg = document.getElementById('adminMsg');
+                msg.innerText = "Todos os bloqueios de todas as contas foram destravados.";
+                msg.className = "success";
+            } catch (error) {
+                const msg = document.getElementById('adminMsg');
+                msg.innerText = "Erro ao destravar contas.";
+                msg.className = "error";
+            }
         }
 
         function enviarRelatorio() {
