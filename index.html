@@ -20,6 +20,8 @@
             --primary-dark: #00335e;
             --secondary: #64748b;
             --secondary-dark: #475569;
+            --warning: #f59e0b;
+            --warning-dark: #d97706;
             --danger: #ef4444;
             --danger-dark: #b91c1c;
             --success: #10b981;
@@ -36,7 +38,7 @@
         
         /* Background da Tela de Login */
         body.login-active {
-            background-image: linear-gradient(rgba(0, 30, 60, 0.8), rgba(0, 30, 60, 0.9)), url('1000076312.jpg');
+            background-image: linear-gradient(rgba(0, 30, 60, 0.85), rgba(0, 30, 60, 0.95)), url('1000076312.jpg');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
@@ -50,7 +52,7 @@
         .app-container { max-width: 1000px; margin: 0 auto; padding: 20px; }
         body.login-active .app-container { padding: 0; width: 100%; max-width: 420px; }
 
-        .card { background: var(--card-bg); border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); padding: 32px; margin-bottom: 24px; border: 1px solid rgba(255,255,255,0.5); }
+        .card { background: var(--card-bg); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); padding: 32px; margin-bottom: 24px; border: 1px solid rgba(255,255,255,0.5); }
         .hidden { display: none !important; }
         
         /* Tipografia e Logo Profissional */
@@ -61,32 +63,43 @@
         
         .section-header { background: var(--primary); color: #fff; padding: 12px 16px; font-size: 13px; font-weight: 600; border-radius: 6px; margin: 32px 0 16px 0; letter-spacing: 0.5px; text-transform: uppercase; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 6px rgba(0,75,135,0.2); }
         
-        /* Layout de Formulário Adaptativo (Desktop vs Mobile) */
+        /* Layout de Formulário */
         .form-grid { display: grid; gap: 16px; }
         .grid-col-1 { grid-template-columns: 1fr; }
         .grid-col-2 { grid-template-columns: 1fr 1fr; }
-        .grid-col-3 { grid-template-columns: 1fr 1fr 1fr; }
         .grid-col-4 { grid-template-columns: repeat(4, 1fr); }
 
         .form-group { display: flex; flex-direction: column; gap: 6px; }
         label { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.3px; }
-        input, textarea { width: 100%; padding: 12px 16px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 14px; background: var(--input-bg); color: var(--text-main); transition: all 0.2s; font-weight: 500; }
-        input:focus, textarea:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 4px rgba(0, 75, 135, 0.1); background: #fff; }
+        input, textarea, select { width: 100%; padding: 12px 16px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 14px; background: var(--input-bg); color: var(--text-main); transition: all 0.2s; font-weight: 500; }
+        select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; background-size: 16px; padding-right: 40px; cursor: pointer; }
+        input:focus, textarea:focus, select:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 4px rgba(0, 75, 135, 0.1); background: #fff; }
+        select:disabled { background-color: #e2e8f0; cursor: not-allowed; color: #94a3b8; }
         
-        /* Botões Profissionais */
+        /* Botões 3D Profissionais com Sombreamento */
         .btn-group { display: flex; gap: 12px; margin-top: 32px; }
-        button { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 14px 24px; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; text-transform: uppercase; letter-spacing: 0.5px; }
-        button:active { transform: translateY(2px); }
-        .btn-primary { background: var(--primary); color: #fff; box-shadow: 0 4px 12px rgba(0, 75, 135, 0.3); }
-        .btn-primary:hover { background: var(--primary-dark); box-shadow: 0 6px 16px rgba(0, 75, 135, 0.4); }
+        button { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 14px 24px; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 4px 6px rgba(0,0,0,0.1), 0 1px 3px rgba(0,0,0,0.08); }
+        button:hover { transform: translateY(-2px); box-shadow: 0 7px 14px rgba(0,0,0,0.15), 0 3px 6px rgba(0,0,0,0.1); }
+        button:active { transform: translateY(1px); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        
+        .btn-primary { background: var(--primary); color: #fff; }
+        .btn-primary:hover { background: var(--primary-dark); }
         .btn-secondary { background: var(--secondary); color: #fff; }
         .btn-secondary:hover { background: var(--secondary-dark); }
         .btn-danger { background: var(--danger); color: #fff; }
         .btn-danger:hover { background: var(--danger-dark); }
+        .btn-warning { background: var(--warning); color: #fff; }
+        .btn-warning:hover { background: var(--warning-dark); }
+        
         .btn-sm { padding: 8px 16px; font-size: 12px; }
         .w-100 { width: 100%; }
         
-        /* Painel de Gestão (Admin) */
+        /* Painel de Gestão (Admin Dashboard) */
+        .dashboard-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+        .stat-card { background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border: 1px solid var(--border); border-radius: 8px; padding: 16px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .stat-value { font-size: 24px; font-weight: 800; color: var(--primary); margin-bottom: 4px; }
+        .stat-label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
+
         .admin-panel { display: grid; gap: 24px; }
         .admin-card { background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 20px; }
         
@@ -101,11 +114,11 @@
         .badge-op { background: #f1f5f9; color: var(--secondary); }
         
         /* Resumo Apresentação */
-        .presentation-view { background: #fff; padding: 20px; border-radius: 8px; border: 1px solid var(--border); }
+        .presentation-view { background: #fff; padding: 24px; border-radius: 8px; border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
         .p-block { margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid #f1f5f9; }
-        .p-block:last-child { border-bottom: none; }
-        .p-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 4px; }
-        .p-value { font-size: 15px; font-weight: 500; color: var(--text-main); white-space: pre-wrap; }
+        .p-block:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        .p-label { font-size: 11px; color: var(--primary); text-transform: uppercase; font-weight: 800; margin-bottom: 6px; }
+        .p-value { font-size: 15px; font-weight: 500; color: var(--text-main); white-space: pre-wrap; line-height: 1.5; }
 
         /* Toast Notifications */
         #toast-container { position: fixed; top: 24px; right: 24px; left: 24px; display: flex; flex-direction: column; gap: 10px; z-index: 9999; pointer-events: none; align-items: flex-end; }
@@ -113,18 +126,20 @@
         .toast.show { opacity: 1; transform: translateX(0); }
         .toast.success { border-left: 6px solid var(--success); }
         .toast.error { border-left: 6px solid var(--danger); }
+        .toast.warning { border-left: 6px solid var(--warning); }
 
         /* Media Queries (Adaptação para Desktop) */
         @media (min-width: 768px) {
             .app-container { padding: 40px 20px; }
             #toast-container { left: auto; }
             .grid-md-2 { grid-template-columns: repeat(2, 1fr); }
-            .grid-md-3 { grid-template-columns: repeat(3, 1fr); }
             .grid-md-4 { grid-template-columns: repeat(4, 1fr); }
             .span-2 { grid-column: span 2; }
-            .span-3 { grid-column: span 3; }
-            
+            .span-4 { grid-column: span 4; }
             .admin-panel { grid-template-columns: 350px 1fr; align-items: start; }
+        }
+        @media (max-width: 767px) {
+            .dashboard-stats { grid-template-columns: 1fr; gap: 12px; }
         }
     </style>
 </head>
@@ -156,7 +171,7 @@
             </div>
         </div>
 
-        <!-- TELA DO FORMULÁRIO (RESTRICTA) -->
+        <!-- TELA DO FORMULÁRIO -->
         <div id="viewForm" class="hidden">
             <div class="card">
                 <div class="header-top">
@@ -167,14 +182,14 @@
                     <div class="mahle-logo" style="font-size: 28px;">MAHLE</div>
                 </div>
                 
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; background: #f8fafc; padding: 12px 16px; border-radius: 8px; border: 1px solid var(--border);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; background: #f8fafc; padding: 12px 16px; border-radius: 8px; border: 1px solid var(--border); box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
                     <div style="font-weight: 600; color: var(--primary); display: flex; align-items: center; gap: 8px;">
                         <span class="material-icons-round" style="font-size: 18px;">account_circle</span>
                         <span id="welcomeText"></span>
                     </div>
                     <div style="display: flex; gap: 12px;">
                         <button id="btnAdmin" class="btn-secondary btn-sm hidden" onclick="App.navigate('viewAdmin')">
-                            <span class="material-icons-round" style="font-size: 16px;">settings</span> Gestão
+                            <span class="material-icons-round" style="font-size: 16px;">dashboard</span> Gestão
                         </button>
                         <button class="btn-danger btn-sm" onclick="App.logout()">
                             <span class="material-icons-round" style="font-size: 16px;">logout</span> Sair
@@ -182,69 +197,105 @@
                     </div>
                 </div>
                 
+                <!-- Campos do Formulário -->
                 <div class="form-grid grid-col-1 grid-md-4">
-                    <div class="form-group span-2"><label>Data do Turno</label><input type="date" id="f_data"></div>
-                    <div class="form-group span-2"><label>Departamento</label><input type="text" id="f_depto" placeholder="Ex: Injeção"></div>
-                    <div class="form-group span-2"><label>Área de Produção</label><input type="text" id="f_area" placeholder="Ex: Linha A"></div>
-                    <div class="form-group span-2"><label>Para (Nome / Próximo Turno)</label><input type="text" id="f_para_nome"></div>
+                    <div class="form-group span-2">
+                        <label>Data do Turno *</label>
+                        <input type="date" id="f_data" required>
+                    </div>
+                    <div class="form-group span-2">
+                        <label>Departamento *</label>
+                        <select id="f_depto" onchange="App.handleDeptoChange()" required>
+                            <option value="" disabled selected>Selecione...</option>
+                            <option value="Injetora">Injetora</option>
+                            <option value="KL">KL</option>
+                            <option value="Canister">Canister</option>
+                            <option value="LX Radial">LX Radial</option>
+                            <option value="Spin On">Spin On</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group span-2">
+                        <label>Área de Produção *</label>
+                        <select id="f_area" disabled required>
+                            <option value="N/A" selected>Bloqueado</option>
+                        </select>
+                    </div>
+                    <div class="form-group span-2">
+                        <label>Para (Nome Próximo Turno) *</label>
+                        <input type="text" id="f_para_nome" placeholder="Nome de quem vai receber" required>
+                    </div>
                     
                     <div class="section-header span-4">
                         <span class="material-icons-round" style="font-size: 18px;">swap_horiz</span> Liderança e Turnos
                     </div>
-                    <div class="form-group span-2"><label>De (Seu Nome)</label><input type="text" id="f_de_nome"></div>
-                    <div class="form-group span-2"><label>De (Seu Turno)</label><input type="text" id="f_de_turno" placeholder="Ex: 05:55 às 14:15"></div>
-                    <div class="form-group span-2"><label>Para (Qual Turno?)</label><input type="text" id="f_para_turno"></div>
+                    
+                    <div class="form-group span-2">
+                        <label>De (Seu Nome) *</label>
+                        <input type="text" id="f_de_nome" required>
+                    </div>
+                    <div class="form-group span-2">
+                        <label>De (Seu Turno) *</label>
+                        <select id="f_de_turno" required>
+                            <option value="" disabled selected>Selecione o turno atual...</option>
+                            <option value="1° turno">1° turno</option>
+                            <option value="2° turno">2° turno</option>
+                            <option value="3° turno">3° turno</option>
+                        </select>
+                    </div>
+                    <div class="form-group span-2">
+                        <label>Para (Qual Turno?) *</label>
+                        <select id="f_para_turno" required>
+                            <option value="" disabled selected>Selecione o próximo turno...</option>
+                            <option value="1° turno">1° turno</option>
+                            <option value="2° turno">2° turno</option>
+                            <option value="3° turno">3° turno</option>
+                        </select>
+                    </div>
                 </div>
 
-                <div class="section-header">
-                    <span class="material-icons-round" style="font-size: 18px;">precision_manufacturing</span> Situação da Produção
-                </div>
-                <div class="form-grid grid-col-1 grid-md-2">
-                    <div class="form-group"><label>Linha / Máquina 1</label><input type="text" id="f_linha1"></div>
-                    <div class="form-group"><label>Comentários (Defeitos/Refugo)</label><input type="text" id="f_coment1"></div>
-                    <div class="form-group"><label>Linha / Máquina 2</label><input type="text" id="f_linha2"></div>
-                    <div class="form-group"><label>Comentários (Defeitos/Refugo)</label><input type="text" id="f_coment2"></div>
-                    <div class="form-group"><label>Linha / Máquina 3</label><input type="text" id="f_linha3"></div>
-                    <div class="form-group"><label>Comentários (Defeitos/Refugo)</label><input type="text" id="f_coment3"></div>
+                <div class="form-group" style="margin-top: 24px;">
+                    <div class="section-header" style="margin-top: 0;">
+                        <span class="material-icons-round" style="font-size: 18px;">precision_manufacturing</span> Situação da Produção *
+                    </div>
+                    <textarea id="f_situacao" rows="4" placeholder="Relate o status geral das máquinas, planejamento x realizado, defeitos e refugo..." required></textarea>
                 </div>
 
                 <div class="form-grid grid-col-1 grid-md-2" style="margin-top: 24px;">
                     <div class="form-group">
-                        <div class="section-header" style="margin-top: 0;"><span class="material-icons-round" style="font-size: 18px;">warning</span> Desvios de Processo</div>
-                        <textarea id="f_desvios" rows="4" placeholder="Relate os desvios aqui..."></textarea>
+                        <div class="section-header" style="margin-top: 0;"><span class="material-icons-round" style="font-size: 18px;">warning</span> Desvios de Processo *</div>
+                        <textarea id="f_desvios" rows="3" placeholder="Relate os desvios aqui..." required></textarea>
                     </div>
                     <div class="form-group">
-                        <div class="section-header" style="margin-top: 0;"><span class="material-icons-round" style="font-size: 18px;">build_circle</span> Paradas (Quebras / Material)</div>
-                        <textarea id="f_paradas" rows="4" placeholder="Relate as paradas de máquina ou falta de insumos..."></textarea>
+                        <div class="section-header" style="margin-top: 0;"><span class="material-icons-round" style="font-size: 18px;">build_circle</span> Paradas (Quebras/Falta de Mat.) *</div>
+                        <textarea id="f_paradas" rows="3" placeholder="Relate as paradas de máquina ou falta de insumos..." required></textarea>
                     </div>
                     <div class="form-group">
-                        <div class="section-header" style="margin-top: 0;"><span class="material-icons-round" style="font-size: 18px;">groups</span> Questões Trabalhistas</div>
-                        <textarea id="f_trabalhistas" rows="4" placeholder="Faltas, atestados, atrasos..."></textarea>
+                        <div class="section-header" style="margin-top: 0;"><span class="material-icons-round" style="font-size: 18px;">groups</span> Questões Trabalhistas *</div>
+                        <textarea id="f_trabalhistas" rows="3" placeholder="Faltas, atestados, atrasos..." required></textarea>
                     </div>
                     <div class="form-group">
-                        <div class="section-header" style="margin-top: 0;"><span class="material-icons-round" style="font-size: 18px;">cleaning_services</span> TPM / 5S</div>
-                        <textarea id="f_tpm" rows="4" placeholder="Status de limpeza, organização da área..."></textarea>
+                        <div class="section-header" style="margin-top: 0;"><span class="material-icons-round" style="font-size: 18px;">cleaning_services</span> TPM / 5S *</div>
+                        <textarea id="f_tpm" rows="3" placeholder="Status de limpeza, organização da área..." required></textarea>
                     </div>
                     <div class="form-group span-2">
-                        <div class="section-header" style="margin-top: 0;"><span class="material-icons-round" style="font-size: 18px;">notes</span> Observações Gerais</div>
-                        <textarea id="f_geral" rows="3" placeholder="Informações adicionais para o próximo turno..."></textarea>
+                        <div class="section-header" style="margin-top: 0;"><span class="material-icons-round" style="font-size: 18px;">notes</span> Observações Gerais *</div>
+                        <textarea id="f_geral" rows="3" placeholder="Informações adicionais para o próximo turno..." required></textarea>
                     </div>
                 </div>
 
                 <div class="btn-group">
-                    <!-- Botão exclusivo de Operador -->
                     <button class="btn-primary w-100 hidden" id="btnSalvarOp" onclick="App.gerarApresentacao()">
                         <span class="material-icons-round">save</span> Salvar para Apresentação
                     </button>
-                    <!-- Botão exclusivo de Admin -->
                     <button class="btn-primary w-100 hidden" id="btnEnviarAdmin" onclick="App.enviarRelatorio()">
-                        <span class="material-icons-round">send</span> Enviar Relatório ao Supervisor
+                        <span class="material-icons-round">send</span> Enviar Relatório por E-mail
                     </button>
                 </div>
             </div>
         </div>
 
-        <!-- TELA DE APRESENTAÇÃO (OPERADOR) -->
+        <!-- TELA DE APRESENTAÇÃO -->
         <div id="viewPresentation" class="hidden">
             <div class="card">
                 <div class="header-top">
@@ -255,9 +306,9 @@
                     <div class="mahle-logo" style="font-size: 28px;">MAHLE</div>
                 </div>
                 
-                <div style="background: #e0f2fe; color: #0284c7; padding: 12px; border-radius: 8px; margin-bottom: 24px; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px;">
-                    <span class="material-icons-round">info</span> 
-                    Apresente esta tela ao responsável pelo próximo turno.
+                <div style="background: #e0f2fe; color: #0284c7; padding: 16px; border-radius: 8px; margin-bottom: 24px; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 12px; border: 1px solid #bae6fd;">
+                    <span class="material-icons-round" style="font-size: 24px;">info</span> 
+                    Apresente esta tela ao responsável pelo próximo turno para a passagem de informações.
                 </div>
 
                 <div class="presentation-view" id="presentationContent">
@@ -275,24 +326,40 @@
             </div>
         </div>
 
-        <!-- TELA ADMIN (GESTÃO DE USUÁRIOS) -->
+        <!-- TELA ADMIN (DASHBOARD E GESTÃO) -->
         <div id="viewAdmin" class="hidden">
             <div class="card">
                 <div class="header-top">
                     <div class="page-title">
-                        <span class="material-icons-round">admin_panel_settings</span>
-                        Painel de Gestão
+                        <span class="material-icons-round">dashboard</span>
+                        Painel de Controle
                     </div>
                     <button class="btn-secondary btn-sm" onclick="App.navigate('viewForm')">
-                        <span class="material-icons-round">arrow_back</span> Voltar ao Formulário
+                        <span class="material-icons-round">arrow_back</span> Voltar
                     </button>
+                </div>
+
+                <!-- Métricas do Sistema -->
+                <div class="dashboard-stats">
+                    <div class="stat-card">
+                        <div class="stat-value" id="statTotal">0</div>
+                        <div class="stat-label">Total de Usuários</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statAdmins" style="color: #0284c7;">0</div>
+                        <div class="stat-label">Administradores</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statOps" style="color: var(--secondary);">0</div>
+                        <div class="stat-label">Operadores</div>
+                    </div>
                 </div>
 
                 <div class="admin-panel">
                     <!-- Coluna 1: Adicionar Usuário -->
                     <div class="admin-card">
                         <div class="page-title" style="font-size: 16px; margin-bottom: 20px;">
-                            <span class="material-icons-round" style="font-size: 20px;">person_add</span> Cadastrar Novo Usuário
+                            <span class="material-icons-round" style="font-size: 20px;">person_add</span> Cadastrar Usuário
                         </div>
                         <div class="form-grid grid-col-1">
                             <div class="form-group">
@@ -304,7 +371,7 @@
                                 <input type="password" id="newPassword" placeholder="Crie uma senha forte">
                             </div>
                             <button class="btn-primary" onclick="App.criarUsuario()" style="margin-top: 8px;">
-                                Criar Acesso
+                                <span class="material-icons-round" style="font-size: 18px;">person_add</span> Criar Acesso
                             </button>
                         </div>
                     </div>
@@ -315,7 +382,7 @@
                             <div class="page-title" style="font-size: 16px;">
                                 <span class="material-icons-round" style="font-size: 20px;">manage_accounts</span> Equipe Cadastrada
                             </div>
-                            <button class="btn-secondary btn-sm" onclick="App.limparBloqueios()">
+                            <button class="btn-warning btn-sm" onclick="App.limparBloqueios()" title="Zerar tentativas falhas de todos">
                                 <span class="material-icons-round" style="font-size: 16px;">lock_open</span> Destravar Todos
                             </button>
                         </div>
@@ -325,7 +392,7 @@
                                 <thead>
                                     <tr>
                                         <th>Colaborador</th>
-                                        <th>Nível de Acesso</th>
+                                        <th>Nível</th>
                                         <th style="text-align: right;">Ações</th>
                                     </tr>
                                 </thead>
@@ -344,7 +411,6 @@
         /** 
          * ARQUITETURA CLEAN CODE - TDT MAHLE
          */
-
         const Config = {
             firebase: {
                 apiKey: "AIzaSyARfglCAGb4ITePr4ede_jBaTJpTEHrxnk",
@@ -384,6 +450,7 @@
                 let icon = 'info';
                 if(type === 'success') icon = 'check_circle';
                 if(type === 'error') icon = 'warning';
+                if(type === 'warning') icon = 'error_outline';
                 
                 el.innerHTML = `<span class="material-icons-round">${icon}</span> <span>${msg}</span>`;
                 container.appendChild(el);
@@ -452,6 +519,10 @@
                     
                     document.getElementById('welcomeText').innerText = `${user}`;
                     this.configureRoleUI(role);
+                    
+                    const fDeNome = document.getElementById('f_de_nome');
+                    if(!fDeNome.value) fDeNome.value = user;
+
                     this.navigate('viewForm');
                 } else {
                     this.navigate('viewLogin');
@@ -491,7 +562,7 @@
                 const user = document.getElementById('loginUser').value.trim();
                 const pass = document.getElementById('loginPass').value;
                 
-                if (!user || !pass) return UI.toast("Preencha todos os campos.", "error");
+                if (!user || !pass) return UI.toast("Preencha todos os campos.", "warning");
 
                 UI.setLoading('btnLogin', true);
 
@@ -543,12 +614,65 @@
                 if(reload) window.location.reload();
             },
             
+            // ===== LÓGICA DO FORMULÁRIO (DEPARTAMENTOS) =====
+            handleDeptoChange() {
+                const depto = document.getElementById('f_depto').value;
+                const area = document.getElementById('f_area');
+                
+                if (depto === 'Injetora') {
+                    area.disabled = false;
+                    area.innerHTML = `
+                        <option value="" disabled selected>Selecione a área...</option>
+                        <option value="Lado A">Lado A</option>
+                        <option value="Lado B">Lado B</option>
+                        <option value="Lado D">Lado D</option>
+                    `;
+                } else {
+                    area.disabled = true;
+                    area.innerHTML = `<option value="N/A" selected>Bloqueado (Apenas Injetora)</option>`;
+                }
+            },
+
+            // ===== VALIDAÇÃO DE FORMULÁRIO OBRIGATÓRIO =====
+            validateForm() {
+                const fields = [
+                    'f_data', 'f_depto', 'f_area', 'f_para_nome', 'f_de_nome', 
+                    'f_de_turno', 'f_para_turno', 'f_situacao', 'f_desvios', 
+                    'f_paradas', 'f_trabalhistas', 'f_tpm', 'f_geral'
+                ];
+
+                for (let id of fields) {
+                    const el = document.getElementById(id);
+                    if (!el.value || el.value === '' || el.value === 'N/A' && id !== 'f_area') {
+                        el.focus();
+                        UI.toast("Preencha todos os campos obrigatórios.", "warning");
+                        return false;
+                    }
+                }
+                return true;
+            },
+
+            getFormData() {
+                const getVal = (id) => {
+                    const el = document.getElementById(id);
+                    return el.disabled ? "N/A" : el.value;
+                };
+                return {
+                    data: getVal('f_data'), depto: getVal('f_depto'), area: getVal('f_area'),
+                    de_nome: getVal('f_de_nome'), para_nome: getVal('f_para_nome'),
+                    de_turno: getVal('f_de_turno'), para_turno: getVal('f_para_turno'),
+                    situacao: getVal('f_situacao'), desvios: getVal('f_desvios'), 
+                    paradas: getVal('f_paradas'), trabalhistas: getVal('f_trabalhistas'), 
+                    tpm: getVal('f_tpm'), geral: getVal('f_geral')
+                };
+            },
+            
             // ===== PAINEL DE GESTÃO (ADMIN) =====
             async criarUsuario() {
                 const newUser = document.getElementById('newUsername').value.trim();
                 const newPass = document.getElementById('newPassword').value;
 
-                if (!newUser || !newPass) return UI.toast("Preencha nome e senha.", "error");
+                if (!newUser || !newPass) return UI.toast("Preencha nome e senha.", "warning");
 
                 try {
                     const userSnap = await this.db.ref('users/' + newUser).once('value');
@@ -558,7 +682,7 @@
                     await this.db.ref('users/' + newUser).set({
                         username: newUser,
                         password: hashedPass,
-                        role: 'operator' // Padrão
+                        role: 'operator'
                     });
 
                     UI.toast(`Usuário ${newUser} criado!`, "success");
@@ -573,9 +697,24 @@
             async limparBloqueios() {
                 try {
                     await this.db.ref('attempts').remove();
-                    UI.toast("Todos os bloqueios foram zerados.", "success");
+                    UI.toast("Tentativas falhas zeradas para toda a equipe.", "success");
                 } catch (error) {
                     UI.toast("Falha ao zerar bloqueios.", "error");
+                }
+            },
+
+            async resetPassword(username) {
+                if(username === Config.superAdmin) return UI.toast("Proibido alterar senha do Super Admin por aqui.", "error");
+                
+                const newPass = prompt(`Digite a nova senha para o usuário ${username}:`);
+                if (newPass === null || newPass.trim() === '') return; // Cancelou ou deixou em branco
+                
+                try {
+                    const hashedPass = await Security.hash(newPass.trim());
+                    await this.db.ref(`users/${username}/password`).set(hashedPass);
+                    UI.toast(`Senha de ${username} redefinida com sucesso!`, "success");
+                } catch (e) {
+                    UI.toast("Erro ao redefinir a senha.", "error");
                 }
             },
 
@@ -587,16 +726,24 @@
                     const snap = await this.db.ref('users').once('value');
                     const users = snap.val() || {};
                     let html = '';
+                    
+                    let countTotal = 0;
+                    let countAdmin = 0;
+                    let countOp = 0;
 
                     Object.values(users).forEach(u => {
+                        countTotal++;
                         const isAdmin = u.role === 'admin';
+                        if (isAdmin) countAdmin++; else countOp++;
+
                         const isSuper = u.username === Config.superAdmin;
                         
                         let actionBtns = '';
                         if (!isSuper) {
                             actionBtns = `
-                                <button class="btn-secondary btn-sm" title="Mudar Nível" onclick="App.toggleRole('${u.username}', '${u.role}')"><span class="material-icons-round" style="font-size: 16px;">${isAdmin ? 'arrow_downward' : 'arrow_upward'}</span></button>
-                                <button class="btn-danger btn-sm" title="Excluir" onclick="App.deleteUser('${u.username}')"><span class="material-icons-round" style="font-size: 16px;">delete</span></button>
+                                <button class="btn-secondary btn-sm" title="Mudar Nível" style="padding: 6px; min-width: 32px;" onclick="App.toggleRole('${u.username}', '${u.role}')"><span class="material-icons-round" style="font-size: 16px;">${isAdmin ? 'arrow_downward' : 'arrow_upward'}</span></button>
+                                <button class="btn-warning btn-sm" title="Redefinir Senha" style="padding: 6px; min-width: 32px;" onclick="App.resetPassword('${u.username}')"><span class="material-icons-round" style="font-size: 16px;">key</span></button>
+                                <button class="btn-danger btn-sm" title="Excluir Usuário" style="padding: 6px; min-width: 32px;" onclick="App.deleteUser('${u.username}')"><span class="material-icons-round" style="font-size: 16px;">delete</span></button>
                             `;
                         } else {
                             actionBtns = `<span style="font-size: 11px; font-weight: 800; color: var(--primary);">SUPER ADMIN</span>`;
@@ -604,12 +751,20 @@
 
                         html += `
                         <tr>
-                            <td><span class="material-icons-round" style="font-size: 16px; vertical-align: text-bottom; color: var(--secondary); margin-right: 4px;">account_circle</span> ${Security.sanitize(u.username)}</td>
-                            <td><span class="badge ${isAdmin ? 'badge-admin' : 'badge-op'}"><span class="material-icons-round" style="font-size: 12px;">${isAdmin ? 'shield' : 'engineering'}</span> ${isAdmin ? 'Administrador' : 'Operador'}</span></td>
-                            <td style="text-align: right; display: flex; justify-content: flex-end; gap: 4px;">${actionBtns}</td>
+                            <td>
+                                <div style="display:flex; align-items:center; gap:8px;">
+                                    <span class="material-icons-round" style="font-size: 20px; color: var(--secondary);">account_circle</span>
+                                    <span style="font-weight: 600;">${Security.sanitize(u.username)}</span>
+                                </div>
+                            </td>
+                            <td><span class="badge ${isAdmin ? 'badge-admin' : 'badge-op'}"><span class="material-icons-round" style="font-size: 14px;">${isAdmin ? 'shield' : 'engineering'}</span> ${isAdmin ? 'Administrador' : 'Operador'}</span></td>
+                            <td style="text-align: right; display: flex; justify-content: flex-end; gap: 6px;">${actionBtns}</td>
                         </tr>`;
                     });
                     
+                    document.getElementById('statTotal').innerText = countTotal;
+                    document.getElementById('statAdmins').innerText = countAdmin;
+                    document.getElementById('statOps').innerText = countOp;
                     listEl.innerHTML = html;
                 } catch (e) {
                     listEl.innerHTML = '<tr><td colspan="3" style="text-align:center; color: var(--danger);">Erro ao carregar lista.</td></tr>';
@@ -644,26 +799,12 @@
                 }
             },
             
-            // ===== ROTINAS DE FORMULÁRIO =====
-            getFormData() {
-                const getVal = (id) => document.getElementById(id).value || 'N/A';
-                return {
-                    data: getVal('f_data'), depto: getVal('f_depto'), area: getVal('f_area'),
-                    de_nome: getVal('f_de_nome'), para_nome: getVal('f_para_nome'),
-                    de_turno: getVal('f_de_turno'), para_turno: getVal('f_para_turno'),
-                    l1: getVal('f_linha1'), c1: getVal('f_coment1'),
-                    l2: getVal('f_linha2'), c2: getVal('f_coment2'),
-                    l3: getVal('f_linha3'), c3: getVal('f_coment3'),
-                    desvios: getVal('f_desvios'), paradas: getVal('f_paradas'),
-                    trabalhistas: getVal('f_trabalhistas'), tpm: getVal('f_tpm'), geral: getVal('f_geral')
-                };
-            },
-
+            // ===== ENVIO E APRESENTAÇÃO =====
             enviarRelatorio() {
+                if(!this.validateForm()) return;
                 const fd = this.getFormData();
-                if(fd.data === 'N/A') return UI.toast("A Data do turno é obrigatória.", "error");
 
-                const assunto = `Relatório de Troca de Turno - ${fd.data}`;
+                const assunto = `Relatório de Troca de Turno - ${fd.data} (${fd.depto})`;
                 const corpo = `
 ==== RELATÓRIO DE TROCA DE TURNO - MAHLE ====
 Data: ${fd.data} | Departamento: ${fd.depto}
@@ -674,9 +815,7 @@ De: ${fd.de_nome} (${fd.de_turno})
 Para: ${fd.para_nome} (${fd.para_turno})
 
 [1. SITUAÇÃO DA PRODUÇÃO]
-- ${fd.l1}: ${fd.c1}
-- ${fd.l2}: ${fd.c2}
-- ${fd.l3}: ${fd.c3}
+${fd.situacao}
 
 [2. DESVIOS DE PROCESSO]
 ${fd.desvios}
@@ -693,7 +832,7 @@ ${fd.tpm}
 [6. OBSERVAÇÕES GERAIS]
 ${fd.geral}
 =============================================
-(Registrado por: ${localStorage.getItem('currentUser')})
+(Registrado sistemicamente por: ${localStorage.getItem('currentUser')})
                 `;
 
                 const link = `mailto:${Config.emailDestino}?subject=${encodeURIComponent(assunto)}&body=${encodeURIComponent(corpo.trim())}`;
@@ -702,8 +841,8 @@ ${fd.geral}
             },
 
             gerarApresentacao() {
+                if(!this.validateForm()) return;
                 const fd = this.getFormData();
-                if(fd.data === 'N/A') return UI.toast("A Data do turno é obrigatória para salvar.", "error");
 
                 const html = `
                     <div class="form-grid grid-col-2" style="margin-bottom: 24px;">
@@ -718,11 +857,7 @@ ${fd.geral}
 
                     <div class="p-block">
                         <div class="p-label">Situação da Produção</div>
-                        <div class="p-value">
-                            ${fd.l1 !== 'N/A' ? `• <b>${fd.l1}:</b> ${fd.c1}<br>` : ''}
-                            ${fd.l2 !== 'N/A' ? `• <b>${fd.l2}:</b> ${fd.c2}<br>` : ''}
-                            ${fd.l3 !== 'N/A' ? `• <b>${fd.l3}:</b> ${fd.c3}` : ''}
-                        </div>
+                        <div class="p-value">${fd.situacao}</div>
                     </div>
 
                     <div class="p-block">
@@ -744,8 +879,8 @@ ${fd.geral}
                         <div class="p-label">Geral</div>
                         <div class="p-value">${fd.geral}</div>
                     </div>
-                    <div style="font-size:11px; color:var(--text-muted); text-align:right;">
-                        Registrado por: ${localStorage.getItem('currentUser')}
+                    <div style="font-size:11px; color:var(--text-muted); text-align:right; border-top: 1px solid var(--border); padding-top: 12px; margin-top: 12px;">
+                        Registrado por: <b>${localStorage.getItem('currentUser')}</b>
                     </div>
                 `;
 
@@ -756,20 +891,28 @@ ${fd.geral}
 
             limparFormulario() {
                 if(confirm("Deseja iniciar um novo turno? Os dados atuais em tela serão apagados.")) {
-                    document.querySelectorAll('#viewForm input, #viewForm textarea').forEach(el => el.value = '');
+                    document.querySelectorAll('#viewForm input, #viewForm textarea, #viewForm select').forEach(el => {
+                        if(el.id !== 'f_de_nome') el.value = ''; // Mantém o nome do usuário logado
+                    });
+                    
+                    // Reseta os selects para o estado default
+                    document.getElementById('f_depto').value = '';
+                    document.getElementById('f_de_turno').value = '';
+                    document.getElementById('f_para_turno').value = '';
+                    this.handleDeptoChange();
+                    
                     this.navigate('viewForm');
                     UI.toast("Formulário limpo.", "info");
                 }
             }
         };
 
-        // Geração de Keyframes para animação de loading no CSS via JS para não poluir o style block
+        // Geração de Keyframes para animação de loading no CSS
         const styleSheet = document.createElement("style");
         styleSheet.innerText = `@keyframes spin { 100% { transform: rotate(360deg); } }`;
         document.head.appendChild(styleSheet);
 
         window.onload = () => App.init();
-
     </script>
 </body>
 </html>
