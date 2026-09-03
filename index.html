@@ -36,7 +36,6 @@
         * { box-sizing: border-box; font-family: 'Inter', sans-serif; margin: 0; padding: 0; }
         body { background: var(--bg-color); color: var(--text-main); transition: background 0.3s; }
         
-        /* Background da Tela de Login */
         body.login-active {
             background-image: linear-gradient(rgba(0, 30, 60, 0.85), rgba(0, 30, 60, 0.95)), url('1000076312.jpg');
             background-size: cover;
@@ -55,7 +54,6 @@
         .card { background: var(--card-bg); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); padding: 32px; margin-bottom: 24px; border: 1px solid rgba(255,255,255,0.5); }
         .hidden { display: none !important; }
         
-        /* Tipografia e Logo Profissional */
         .mahle-logo { font-family: 'Arial Black', Impact, sans-serif; font-size: 38px; font-weight: 900; color: var(--primary); letter-spacing: -2px; margin: 0; line-height: 1; text-transform: uppercase; }
         .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 2px solid var(--border); }
         .page-title { color: var(--text-main); font-size: 22px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
@@ -63,7 +61,6 @@
         
         .section-header { background: var(--primary); color: #fff; padding: 12px 16px; font-size: 13px; font-weight: 600; border-radius: 6px; margin: 32px 0 16px 0; letter-spacing: 0.5px; text-transform: uppercase; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 6px rgba(0,75,135,0.2); }
         
-        /* Layout de Formulário */
         .form-grid { display: grid; gap: 16px; }
         .grid-col-1 { grid-template-columns: 1fr; }
         .grid-col-2 { grid-template-columns: 1fr 1fr; }
@@ -76,7 +73,6 @@
         input:focus, textarea:focus, select:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 4px rgba(0, 75, 135, 0.1); background: #fff; }
         select:disabled { background-color: #e2e8f0; cursor: not-allowed; color: #94a3b8; }
         
-        /* Botões 3D Profissionais com Sombreamento */
         .btn-group { display: flex; gap: 12px; margin-top: 32px; }
         button { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 14px 24px; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 4px 6px rgba(0,0,0,0.1), 0 1px 3px rgba(0,0,0,0.08); }
         button:hover { transform: translateY(-2px); box-shadow: 0 7px 14px rgba(0,0,0,0.15), 0 3px 6px rgba(0,0,0,0.1); }
@@ -90,11 +86,12 @@
         .btn-danger:hover { background: var(--danger-dark); }
         .btn-warning { background: var(--warning); color: #fff; }
         .btn-warning:hover { background: var(--warning-dark); }
+        .btn-nfc { background: #0284c7; color: #fff; }
+        .btn-nfc:hover { background: #0369a1; }
         
         .btn-sm { padding: 8px 16px; font-size: 12px; }
         .w-100 { width: 100%; }
         
-        /* Painel de Gestão (Admin Dashboard) */
         .dashboard-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
         .stat-card { background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border: 1px solid var(--border); border-radius: 8px; padding: 16px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         .stat-value { font-size: 24px; font-weight: 800; color: var(--primary); margin-bottom: 4px; }
@@ -113,14 +110,12 @@
         .badge-admin { background: #e0f2fe; color: #0284c7; }
         .badge-op { background: #f1f5f9; color: var(--secondary); }
         
-        /* Resumo Apresentação */
         .presentation-view { background: #fff; padding: 24px; border-radius: 8px; border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
         .p-block { margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid #f1f5f9; }
         .p-block:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
         .p-label { font-size: 11px; color: var(--primary); text-transform: uppercase; font-weight: 800; margin-bottom: 6px; }
         .p-value { font-size: 15px; font-weight: 500; color: var(--text-main); white-space: pre-wrap; line-height: 1.5; }
 
-        /* Toast Notifications */
         #toast-container { position: fixed; top: 24px; right: 24px; left: 24px; display: flex; flex-direction: column; gap: 10px; z-index: 9999; pointer-events: none; align-items: flex-end; }
         .toast { background: #1e293b; color: #fff; padding: 16px 24px; border-radius: 8px; font-size: 14px; font-weight: 600; box-shadow: 0 10px 25px rgba(0,0,0,0.2); opacity: 0; transform: translateX(50px); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; align-items: center; gap: 12px; max-width: 400px; }
         .toast.show { opacity: 1; transform: translateX(0); }
@@ -128,7 +123,6 @@
         .toast.error { border-left: 6px solid var(--danger); }
         .toast.warning { border-left: 6px solid var(--warning); }
 
-        /* Media Queries (Adaptação para Desktop) */
         @media (min-width: 768px) {
             .app-container { padding: 40px 20px; }
             #toast-container { left: auto; }
@@ -157,6 +151,15 @@
             </div>
             
             <div class="form-grid grid-col-1">
+                <!-- Botão de Login por Crachá NFC -->
+                <button class="btn-nfc w-100" onclick="App.loginNFC()" id="btnNfcLogin" style="padding: 16px; margin-bottom: 12px;">
+                    <span class="material-icons-round" style="font-size: 22px;">nfc</span> Entrar com Crachá (RFID)
+                </button>
+                
+                <div style="text-align: center; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin: 4px 0 12px 0;">
+                    — Ou acesse com usuário e senha —
+                </div>
+
                 <div class="form-group">
                     <label>Usuário de Acesso</label>
                     <input type="text" id="loginUser" placeholder="Digite seu usuário" autocapitalize="none">
@@ -197,7 +200,6 @@
                     </div>
                 </div>
                 
-                <!-- Campos do Formulário -->
                 <div class="form-grid grid-col-1 grid-md-4">
                     <div class="form-group span-2">
                         <label>Data do Turno *</label>
@@ -326,7 +328,7 @@
             </div>
         </div>
 
-        <!-- TELA ADMIN (DASHBOARD E GESTÃO) -->
+        <!-- TELA ADMIN -->
         <div id="viewAdmin" class="hidden">
             <div class="card">
                 <div class="header-top">
@@ -339,7 +341,6 @@
                     </button>
                 </div>
 
-                <!-- Métricas do Sistema -->
                 <div class="dashboard-stats">
                     <div class="stat-card">
                         <div class="stat-value" id="statTotal">0</div>
@@ -356,7 +357,7 @@
                 </div>
 
                 <div class="admin-panel">
-                    <!-- Coluna 1: Adicionar Usuário -->
+                    <!-- Cadastrar Usuário -->
                     <div class="admin-card">
                         <div class="page-title" style="font-size: 16px; margin-bottom: 20px;">
                             <span class="material-icons-round" style="font-size: 20px;">person_add</span> Cadastrar Usuário
@@ -376,13 +377,13 @@
                         </div>
                     </div>
 
-                    <!-- Coluna 2: Lista de Equipe -->
+                    <!-- Lista de Equipe -->
                     <div>
                         <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 16px;">
                             <div class="page-title" style="font-size: 16px;">
                                 <span class="material-icons-round" style="font-size: 20px;">manage_accounts</span> Equipe Cadastrada
                             </div>
-                            <button class="btn-warning btn-sm" onclick="App.limparBloqueios()" title="Zerar tentativas falhas de todos">
+                            <button class="btn-warning btn-sm" onclick="App.limparBloqueios()">
                                 <span class="material-icons-round" style="font-size: 16px;">lock_open</span> Destravar Todos
                             </button>
                         </div>
@@ -409,7 +410,7 @@
 
     <script>
         /** 
-         * ARQUITETURA CLEAN CODE - TDT MAHLE
+         * ARQUITETURA CLEAN CODE - TDT MAHLE COM SUPORTE WEB NFC
          */
         const Config = {
             firebase: {
@@ -609,12 +610,79 @@
                 }
             },
 
+            // ===== AUTENTICAÇÃO POR CRACHÁ (WEB NFC) =====
+            async loginNFC() {
+                if (!('NDEFReader' in window)) {
+                    return UI.toast("NFC não suportado neste aparelho ou navegador.", "warning");
+                }
+
+                UI.toast("Aproxime o crachá da traseira do celular...", "info");
+
+                try {
+                    const ndef = new NDEFReader();
+                    await ndef.scan();
+                    
+                    ndef.addEventListener("reading", async ({ serialNumber }) => {
+                        if (!serialNumber) return UI.toast("Não foi possível ler o ID do crachá.", "error");
+                        
+                        const hashedNfc = await Security.hash(serialNumber);
+                        
+                        // Busca no Firebase qual usuário possui esse crachá cadastrado
+                        const usersSnap = await this.db.ref('users').once('value');
+                        const users = usersSnap.val() || {};
+                        
+                        let foundUser = null;
+                        Object.values(users).forEach(u => {
+                            if (u.nfcTag === hashedNfc) foundUser = u;
+                        });
+
+                        if (foundUser) {
+                            localStorage.setItem('currentUser', foundUser.username);
+                            localStorage.setItem('currentRole', foundUser.role);
+                            localStorage.setItem('loginTime', Date.now().toString());
+                            UI.toast(`Crachá reconhecido! Bem-vindo, ${foundUser.username}.`, "success");
+                            setTimeout(() => window.location.reload(), 1000);
+                        } else {
+                            UI.toast("Crachá não cadastrado no sistema.", "error");
+                        }
+                    });
+
+                } catch (error) {
+                    UI.toast("Erro ao ativar leitor de crachá.", "error");
+                }
+            },
+
+            async cadastrarNFC(username) {
+                if (!('NDEFReader' in window)) {
+                    return UI.toast("Este celular não possui suporte a NFC.", "warning");
+                }
+
+                UI.toast(`Aproxime o crachá de ${username} para registrar...`, "info");
+
+                try {
+                    const ndef = new NDEFReader();
+                    await ndef.scan();
+                    
+                    ndef.addEventListener("reading", async ({ serialNumber }) => {
+                        if (!serialNumber) return UI.toast("Falha ao capturar código do crachá.", "error");
+                        
+                        const hashedNfc = await Security.hash(serialNumber);
+                        await this.db.ref(`users/${username}/nfcTag`).set(hashedNfc);
+                        
+                        UI.toast(`Crachá vinculado com sucesso a ${username}!`, "success");
+                        this.renderUserList();
+                    }, { once: true }); // Lê apenas uma vez
+
+                } catch (error) {
+                    UI.toast("Cancelado ou erro ao ler crachá.", "error");
+                }
+            },
+
             logout(reload = true) {
                 localStorage.clear();
                 if(reload) window.location.reload();
             },
             
-            // ===== LÓGICA DO FORMULÁRIO (DEPARTAMENTOS) =====
             handleDeptoChange() {
                 const depto = document.getElementById('f_depto').value;
                 const area = document.getElementById('f_area');
@@ -633,7 +701,6 @@
                 }
             },
 
-            // ===== VALIDAÇÃO DE FORMULÁRIO OBRIGATÓRIO =====
             validateForm() {
                 const fields = [
                     'f_data', 'f_depto', 'f_area', 'f_para_nome', 'f_de_nome', 
@@ -667,7 +734,7 @@
                 };
             },
             
-            // ===== PAINEL DE GESTÃO (ADMIN) =====
+            // ===== PAINEL DE GESTÃO =====
             async criarUsuario() {
                 const newUser = document.getElementById('newUsername').value.trim();
                 const newPass = document.getElementById('newPassword').value;
@@ -707,7 +774,7 @@
                 if(username === Config.superAdmin) return UI.toast("Proibido alterar senha do Super Admin por aqui.", "error");
                 
                 const newPass = prompt(`Digite a nova senha para o usuário ${username}:`);
-                if (newPass === null || newPass.trim() === '') return; // Cancelou ou deixou em branco
+                if (newPass === null || newPass.trim() === '') return;
                 
                 try {
                     const hashedPass = await Security.hash(newPass.trim());
@@ -727,9 +794,7 @@
                     const users = snap.val() || {};
                     let html = '';
                     
-                    let countTotal = 0;
-                    let countAdmin = 0;
-                    let countOp = 0;
+                    let countTotal = 0, countAdmin = 0, countOp = 0;
 
                     Object.values(users).forEach(u => {
                         countTotal++;
@@ -737,13 +802,23 @@
                         if (isAdmin) countAdmin++; else countOp++;
 
                         const isSuper = u.username === Config.superAdmin;
+                        const hasNfc = !!u.nfcTag;
                         
                         let actionBtns = '';
                         if (!isSuper) {
                             actionBtns = `
-                                <button class="btn-secondary btn-sm" title="Mudar Nível" style="padding: 6px; min-width: 32px;" onclick="App.toggleRole('${u.username}', '${u.role}')"><span class="material-icons-round" style="font-size: 16px;">${isAdmin ? 'arrow_downward' : 'arrow_upward'}</span></button>
-                                <button class="btn-warning btn-sm" title="Redefinir Senha" style="padding: 6px; min-width: 32px;" onclick="App.resetPassword('${u.username}')"><span class="material-icons-round" style="font-size: 16px;">key</span></button>
-                                <button class="btn-danger btn-sm" title="Excluir Usuário" style="padding: 6px; min-width: 32px;" onclick="App.deleteUser('${u.username}')"><span class="material-icons-round" style="font-size: 16px;">delete</span></button>
+                                <button class="btn-nfc btn-sm" title="${hasNfc ? 'Crachá Vinculado (Clique p/ Recadastrar)' : 'Vincular Crachá'}" style="padding: 6px; min-width: 32px;" onclick="App.cadastrarNFC('${u.username}')">
+                                    <span class="material-icons-round" style="font-size: 16px;">${hasNfc ? 'nfc' : 'add_card'}</span>
+                                </button>
+                                <button class="btn-secondary btn-sm" title="Mudar Nível" style="padding: 6px; min-width: 32px;" onclick="App.toggleRole('${u.username}', '${u.role}')">
+                                    <span class="material-icons-round" style="font-size: 16px;">${isAdmin ? 'arrow_downward' : 'arrow_upward'}</span>
+                                </button>
+                                <button class="btn-warning btn-sm" title="Redefinir Senha" style="padding: 6px; min-width: 32px;" onclick="App.resetPassword('${u.username}')">
+                                    <span class="material-icons-round" style="font-size: 16px;">key</span>
+                                </button>
+                                <button class="btn-danger btn-sm" title="Excluir Usuário" style="padding: 6px; min-width: 32px;" onclick="App.deleteUser('${u.username}')">
+                                    <span class="material-icons-round" style="font-size: 16px;">delete</span>
+                                </button>
                             `;
                         } else {
                             actionBtns = `<span style="font-size: 11px; font-weight: 800; color: var(--primary);">SUPER ADMIN</span>`;
@@ -755,6 +830,7 @@
                                 <div style="display:flex; align-items:center; gap:8px;">
                                     <span class="material-icons-round" style="font-size: 20px; color: var(--secondary);">account_circle</span>
                                     <span style="font-weight: 600;">${Security.sanitize(u.username)}</span>
+                                    ${hasNfc ? '<span class="material-icons-round" style="font-size:16px; color:#0284c7;" title="Crachá RFID Vinculado">nfc</span>' : ''}
                                 </div>
                             </td>
                             <td><span class="badge ${isAdmin ? 'badge-admin' : 'badge-op'}"><span class="material-icons-round" style="font-size: 14px;">${isAdmin ? 'shield' : 'engineering'}</span> ${isAdmin ? 'Administrador' : 'Operador'}</span></td>
@@ -799,7 +875,6 @@
                 }
             },
             
-            // ===== ENVIO E APRESENTAÇÃO =====
             enviarRelatorio() {
                 if(!this.validateForm()) return;
                 const fd = this.getFormData();
@@ -892,10 +967,9 @@ ${fd.geral}
             limparFormulario() {
                 if(confirm("Deseja iniciar um novo turno? Os dados atuais em tela serão apagados.")) {
                     document.querySelectorAll('#viewForm input, #viewForm textarea, #viewForm select').forEach(el => {
-                        if(el.id !== 'f_de_nome') el.value = ''; // Mantém o nome do usuário logado
+                        if(el.id !== 'f_de_nome') el.value = '';
                     });
                     
-                    // Reseta os selects para o estado default
                     document.getElementById('f_depto').value = '';
                     document.getElementById('f_de_turno').value = '';
                     document.getElementById('f_para_turno').value = '';
@@ -907,7 +981,6 @@ ${fd.geral}
             }
         };
 
-        // Geração de Keyframes para animação de loading no CSS
         const styleSheet = document.createElement("style");
         styleSheet.innerText = `@keyframes spin { 100% { transform: rotate(360deg); } }`;
         document.head.appendChild(styleSheet);
