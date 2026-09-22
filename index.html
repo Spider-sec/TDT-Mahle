@@ -99,6 +99,7 @@
 
         .admin-panel { display: grid; gap: 24px; }
         .admin-card { background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 20px; }
+        .full-width { grid-column: 1 / -1; }
         
         .user-table-wrapper { overflow-x: auto; background: #fff; border: 1px solid var(--border); border-radius: 8px; }
         .user-table { width: 100%; border-collapse: collapse; text-align: left; }
@@ -297,7 +298,7 @@
             </div>
         </div>
 
-        <!-- TELA DE APRESENTAÇÃO -->
+        <!-- TELA DE APRESENTAÇÃO / VISUALIZAÇÃO -->
         <div id="viewPresentation" class="hidden">
             <div class="card">
                 <div class="header-top">
@@ -308,7 +309,7 @@
                     <div class="mahle-logo" style="font-size: 28px;">MAHLE</div>
                 </div>
                 
-                <div style="background: #e0f2fe; color: #0284c7; padding: 16px; border-radius: 8px; margin-bottom: 24px; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 12px; border: 1px solid #bae6fd;">
+                <div id="presentationAlert" style="background: #e0f2fe; color: #0284c7; padding: 16px; border-radius: 8px; margin-bottom: 24px; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 12px; border: 1px solid #bae6fd;">
                     <span class="material-icons-round" style="font-size: 24px;">info</span> 
                     Apresente esta tela ao responsável pelo próximo turno para a passagem de informações.
                 </div>
@@ -318,10 +319,10 @@
                 </div>
 
                 <div class="btn-group">
-                    <button class="btn-secondary w-100" onclick="App.navigate('viewForm')">
-                        <span class="material-icons-round">edit</span> Voltar e Editar
+                    <button class="btn-secondary w-100" id="btnBackPresentation" onclick="App.voltarDaApresentacao()">
+                        <span class="material-icons-round">arrow_back</span> Voltar
                     </button>
-                    <button class="btn-primary w-100" onclick="App.limparFormulario()">
+                    <button class="btn-primary w-100" id="btnNewTurno" onclick="App.limparFormulario()">
                         <span class="material-icons-round">add_circle</span> Iniciar Novo Turno
                     </button>
                 </div>
@@ -403,6 +404,34 @@
                             </table>
                         </div>
                     </div>
+
+                    <!-- Histórico de Relatórios -->
+                    <div class="admin-card full-width" style="margin-top: 16px;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 16px;">
+                            <div class="page-title" style="font-size: 16px;">
+                                <span class="material-icons-round" style="font-size: 20px;">history_edu</span> Histórico de Trocas de Turno
+                            </div>
+                            <button class="btn-primary btn-sm" onclick="App.gerarRelatorioSemanal()">
+                                <span class="material-icons-round" style="font-size: 16px;">calendar_month</span> Gerar Relatório Semanal
+                            </button>
+                        </div>
+                        <div class="user-table-wrapper" style="max-height: 400px; overflow-y: auto;">
+                            <table class="user-table">
+                                <thead>
+                                    <tr>
+                                        <th>Data / Hora Registro</th>
+                                        <th>Depto / Área</th>
+                                        <th>Turnos</th>
+                                        <th>Responsável</th>
+                                        <th style="text-align: right;">Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="reportsList">
+                                    <!-- Injetado via JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -410,7 +439,7 @@
 
     <script>
         /** 
-         * ARQUITETURA CLEAN CODE - TDT MAHLE COM SUPORTE WEB NFC
+         * ARQUITETURA CLEAN CODE - TDT MAHLE COM SUPORTE WEB NFC E HISTÓRICO BD
          */
         const Config = {
             firebase: {
@@ -485,6 +514,7 @@
         const App = {
             db: null,
             isReady: false,
+            viewingHistory: false,
 
             async init() {
                 firebase.initializeApp(Config.firebase);
@@ -524,6 +554,7 @@
                     const fDeNome = document.getElementById('f_de_nome');
                     if(!fDeNome.value) fDeNome.value = user;
 
+                    this.verificarRelatorioSemanalAutomatico();
                     this.navigate('viewForm');
                 } else {
                     this.navigate('viewLogin');
@@ -554,7 +585,10 @@
                 
                 UI.setBackground(viewId === 'viewLogin');
                 
-                if (viewId === 'viewAdmin') this.renderUserList();
+                if (viewId === 'viewAdmin') {
+                    this.renderUserList();
+                    this.renderReportsList();
+                }
             },
 
             async login() {
@@ -610,7 +644,6 @@
                 }
             },
 
-            // ===== AUTENTICAÇÃO POR CRACHÁ (WEB NFC) =====
             async loginNFC() {
                 if (!('NDEFReader' in window)) {
                     return UI.toast("NFC não suportado neste aparelho ou navegador.", "warning");
@@ -627,7 +660,6 @@
                         
                         const hashedNfc = await Security.hash(serialNumber);
                         
-                        // Busca no Firebase qual usuário possui esse crachá cadastrado
                         const usersSnap = await this.db.ref('users').once('value');
                         const users = usersSnap.val() || {};
                         
@@ -671,7 +703,7 @@
                         
                         UI.toast(`Crachá vinculado com sucesso a ${username}!`, "success");
                         this.renderUserList();
-                    }, { once: true }); // Lê apenas uma vez
+                    }, { once: true }); 
 
                 } catch (error) {
                     UI.toast("Cancelado ou erro ao ler crachá.", "error");
@@ -710,7 +742,7 @@
 
                 for (let id of fields) {
                     const el = document.getElementById(id);
-                    if (!el.value || el.value === '' || el.value === 'N/A' && id !== 'f_area') {
+                    if (!el.value || el.value === '' || (el.value === 'N/A' && id !== 'f_area')) {
                         el.focus();
                         UI.toast("Preencha todos os campos obrigatórios.", "warning");
                         return false;
@@ -733,8 +765,158 @@
                     tpm: getVal('f_tpm'), geral: getVal('f_geral')
                 };
             },
+
+            // ===== BANCO DE DADOS DE RELATÓRIOS =====
+            async salvarRelatorioBD() {
+                const fd = this.getFormData();
+                fd.timestamp = Date.now();
+                fd.autor = localStorage.getItem('currentUser');
+                
+                try {
+                    await this.db.ref('reports').push(fd);
+                    return true;
+                } catch(e) {
+                    console.error(e);
+                    UI.toast("Erro ao salvar relatório no banco de dados.", "error");
+                    return false;
+                }
+            },
             
-            // ===== PAINEL DE GESTÃO =====
+            async enviarRelatorio() {
+                if(!this.validateForm()) return;
+                
+                const salvo = await this.salvarRelatorioBD();
+                if(!salvo) return;
+
+                const fd = this.getFormData();
+                const assunto = `Relatório de Troca de Turno - ${fd.data} (${fd.depto})`;
+                const corpo = `
+==== RELATÓRIO DE TROCA DE TURNO - MAHLE ====
+Data: ${fd.data} | Departamento: ${fd.depto}
+Área de Produção: ${fd.area}
+
+[LIDERANÇA]
+De: ${fd.de_nome} (${fd.de_turno})
+Para: ${fd.para_nome} (${fd.para_turno})
+
+[1. SITUAÇÃO DA PRODUÇÃO]
+${fd.situacao}
+
+[2. DESVIOS DE PROCESSO]
+${fd.desvios}
+
+[3. PARADAS E QUEBRAS]
+${fd.paradas}
+
+[4. QUESTÕES TRABALHISTAS]
+${fd.trabalhistas}
+
+[5. TPM / 5S]
+${fd.tpm}
+
+[6. OBSERVAÇÕES GERAIS]
+${fd.geral}
+=============================================
+(Registrado sistemicamente por: ${localStorage.getItem('currentUser')})
+                `;
+
+                const link = `mailto:${Config.emailDestino}?subject=${encodeURIComponent(assunto)}&body=${encodeURIComponent(corpo.trim())}`;
+                window.location.href = link;
+                UI.toast("Salvo no sistema e aplicativo de e-mail aberto!", "success");
+            },
+
+            async gerarApresentacao() {
+                if(!this.validateForm()) return;
+                
+                const salvo = await this.salvarRelatorioBD();
+                if(!salvo) return;
+
+                const fd = this.getFormData();
+                this.renderizarVisualizacao(fd, true);
+                UI.toast("Formulário salvo no sistema e pronto para apresentação.", "success");
+            },
+
+            renderizarVisualizacao(fd, isNew) {
+                const html = `
+                    <div class="form-grid grid-col-2" style="margin-bottom: 24px;">
+                        <div><div class="p-label">Data do Turno</div><div class="p-value">${fd.data}</div></div>
+                        <div><div class="p-label">Departamento / Área</div><div class="p-value">${fd.depto} - ${fd.area}</div></div>
+                    </div>
+                    
+                    <div class="p-block">
+                        <div class="p-label">Passagem de Turno</div>
+                        <div class="p-value">De: <b>${fd.de_nome}</b> (${fd.de_turno})<br>Para: <b>${fd.para_nome}</b> (${fd.para_turno})</div>
+                    </div>
+
+                    <div class="p-block">
+                        <div class="p-label">Situação da Produção</div>
+                        <div class="p-value">${fd.situacao}</div>
+                    </div>
+
+                    <div class="p-block">
+                        <div class="p-label">Desvios de Processo</div>
+                        <div class="p-value">${fd.desvios}</div>
+                    </div>
+
+                    <div class="p-block">
+                        <div class="p-label">Paradas / Quebras</div>
+                        <div class="p-value">${fd.paradas}</div>
+                    </div>
+
+                    <div class="p-block">
+                        <div class="p-label">Questões Trabalhistas & TPM / 5S</div>
+                        <div class="p-value"><b>RH:</b> ${fd.trabalhistas}<br><br><b>5S:</b> ${fd.tpm}</div>
+                    </div>
+
+                    <div class="p-block" style="border:none;">
+                        <div class="p-label">Geral</div>
+                        <div class="p-value">${fd.geral}</div>
+                    </div>
+                    <div style="font-size:11px; color:var(--text-muted); text-align:right; border-top: 1px solid var(--border); padding-top: 12px; margin-top: 12px;">
+                        Registrado por: <b>${fd.autor || localStorage.getItem('currentUser')}</b> em ${fd.timestamp ? new Date(fd.timestamp).toLocaleString('pt-BR') : 'Agora'}
+                    </div>
+                `;
+
+                document.getElementById('presentationContent').innerHTML = html;
+                
+                // Adjust view based on context (Creating new vs viewing history)
+                this.viewingHistory = !isNew;
+                if(isNew) {
+                    document.getElementById('presentationAlert').classList.remove('hidden');
+                    document.getElementById('btnNewTurno').classList.remove('hidden');
+                } else {
+                    document.getElementById('presentationAlert').classList.add('hidden');
+                    document.getElementById('btnNewTurno').classList.add('hidden');
+                }
+
+                this.navigate('viewPresentation');
+            },
+
+            voltarDaApresentacao() {
+                if(this.viewingHistory) {
+                    this.viewingHistory = false;
+                    this.navigate('viewAdmin');
+                } else {
+                    this.navigate('viewForm');
+                }
+            },
+
+            limparFormulario() {
+                if(confirm("Deseja iniciar um novo turno? Os dados em tela serão limpos (já estão salvos no sistema).")) {
+                    document.querySelectorAll('#viewForm input, #viewForm textarea, #viewForm select').forEach(el => {
+                        if(el.id !== 'f_de_nome') el.value = '';
+                    });
+                    
+                    document.getElementById('f_depto').value = '';
+                    document.getElementById('f_de_turno').value = '';
+                    document.getElementById('f_para_turno').value = '';
+                    this.handleDeptoChange();
+                    
+                    this.navigate('viewForm');
+                }
+            },
+
+            // ===== PAINEL DE GESTÃO - USUÁRIOS =====
             async criarUsuario() {
                 const newUser = document.getElementById('newUsername').value.trim();
                 const newPass = document.getElementById('newPassword').value;
@@ -874,109 +1056,135 @@
                     }
                 }
             },
-            
-            enviarRelatorio() {
-                if(!this.validateForm()) return;
-                const fd = this.getFormData();
 
-                const assunto = `Relatório de Troca de Turno - ${fd.data} (${fd.depto})`;
-                const corpo = `
-==== RELATÓRIO DE TROCA DE TURNO - MAHLE ====
-Data: ${fd.data} | Departamento: ${fd.depto}
-Área de Produção: ${fd.area}
-
-[LIDERANÇA]
-De: ${fd.de_nome} (${fd.de_turno})
-Para: ${fd.para_nome} (${fd.para_turno})
-
-[1. SITUAÇÃO DA PRODUÇÃO]
-${fd.situacao}
-
-[2. DESVIOS DE PROCESSO]
-${fd.desvios}
-
-[3. PARADAS E QUEBRAS]
-${fd.paradas}
-
-[4. QUESTÕES TRABALHISTAS]
-${fd.trabalhistas}
-
-[5. TPM / 5S]
-${fd.tpm}
-
-[6. OBSERVAÇÕES GERAIS]
-${fd.geral}
-=============================================
-(Registrado sistemicamente por: ${localStorage.getItem('currentUser')})
-                `;
-
-                const link = `mailto:${Config.emailDestino}?subject=${encodeURIComponent(assunto)}&body=${encodeURIComponent(corpo.trim())}`;
-                window.location.href = link;
-                UI.toast("Aplicativo de e-mail aberto!", "success");
-            },
-
-            gerarApresentacao() {
-                if(!this.validateForm()) return;
-                const fd = this.getFormData();
-
-                const html = `
-                    <div class="form-grid grid-col-2" style="margin-bottom: 24px;">
-                        <div><div class="p-label">Data</div><div class="p-value">${fd.data}</div></div>
-                        <div><div class="p-label">Departamento / Área</div><div class="p-value">${fd.depto} - ${fd.area}</div></div>
-                    </div>
+            // ===== PAINEL DE GESTÃO - RELATÓRIOS & HISTÓRICO =====
+            async renderReportsList() {
+                const listEl = document.getElementById('reportsList');
+                listEl.innerHTML = '<tr><td colspan="5" style="text-align:center; color: var(--text-muted);">Carregando histórico...</td></tr>';
+                
+                try {
+                    const snap = await this.db.ref('reports').orderByChild('timestamp').limitToLast(50).once('value');
+                    const reports = snap.val() || {};
+                    let html = '';
                     
-                    <div class="p-block">
-                        <div class="p-label">Passagem de Turno</div>
-                        <div class="p-value">De: <b>${fd.de_nome}</b> (${fd.de_turno})<br>Para: <b>${fd.para_nome}</b> (${fd.para_turno})</div>
-                    </div>
-
-                    <div class="p-block">
-                        <div class="p-label">Situação da Produção</div>
-                        <div class="p-value">${fd.situacao}</div>
-                    </div>
-
-                    <div class="p-block">
-                        <div class="p-label">Desvios de Processo</div>
-                        <div class="p-value">${fd.desvios}</div>
-                    </div>
-
-                    <div class="p-block">
-                        <div class="p-label">Paradas / Quebras</div>
-                        <div class="p-value">${fd.paradas}</div>
-                    </div>
-
-                    <div class="p-block">
-                        <div class="p-label">Questões Trabalhistas & TPM / 5S</div>
-                        <div class="p-value"><b>RH:</b> ${fd.trabalhistas}<br><br><b>5S:</b> ${fd.tpm}</div>
-                    </div>
-
-                    <div class="p-block" style="border:none;">
-                        <div class="p-label">Geral</div>
-                        <div class="p-value">${fd.geral}</div>
-                    </div>
-                    <div style="font-size:11px; color:var(--text-muted); text-align:right; border-top: 1px solid var(--border); padding-top: 12px; margin-top: 12px;">
-                        Registrado por: <b>${localStorage.getItem('currentUser')}</b>
-                    </div>
-                `;
-
-                document.getElementById('presentationContent').innerHTML = html;
-                this.navigate('viewPresentation');
-                UI.toast("Formulário salvo localmente para visualização.", "success");
-            },
-
-            limparFormulario() {
-                if(confirm("Deseja iniciar um novo turno? Os dados atuais em tela serão apagados.")) {
-                    document.querySelectorAll('#viewForm input, #viewForm textarea, #viewForm select').forEach(el => {
-                        if(el.id !== 'f_de_nome') el.value = '';
+                    // Ordenar decrescente (mais recente primeiro)
+                    const sorted = Object.entries(reports).sort((a,b) => b[1].timestamp - a[1].timestamp);
+                    
+                    sorted.forEach(([key, r]) => {
+                        const dataObj = new Date(r.timestamp);
+                        const dataStr = `${dataObj.toLocaleDateString('pt-BR')} às ${dataObj.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'})}`;
+                        html += `
+                        <tr>
+                            <td>${dataStr}</td>
+                            <td>${r.depto} - ${r.area}</td>
+                            <td><span style="font-size: 12px;">${r.de_turno} ➔ ${r.para_turno}</span></td>
+                            <td><b>${r.autor}</b></td>
+                            <td style="text-align: right;">
+                                <button class="btn-secondary btn-sm" onclick="App.visualizarRelatorioAdmin('${key}')">
+                                    <span class="material-icons-round" style="font-size: 16px;">visibility</span> Abrir
+                                </button>
+                            </td>
+                        </tr>
+                        `;
                     });
+                    if(sorted.length === 0) html = '<tr><td colspan="5" style="text-align:center;">Nenhum relatório salvo ainda.</td></tr>';
+                    listEl.innerHTML = html;
+                } catch(e) {
+                    listEl.innerHTML = '<tr><td colspan="5" style="text-align:center; color: var(--danger);">Erro ao carregar histórico.</td></tr>';
+                }
+            },
+
+            async visualizarRelatorioAdmin(id) {
+                try {
+                    const snap = await this.db.ref('reports/' + id).once('value');
+                    if(!snap.exists()) return UI.toast("Relatório não encontrado.", "error");
                     
-                    document.getElementById('f_depto').value = '';
-                    document.getElementById('f_de_turno').value = '';
-                    document.getElementById('f_para_turno').value = '';
-                    this.handleDeptoChange();
+                    const fd = snap.val();
+                    this.renderizarVisualizacao(fd, false);
+                } catch(e) {
+                    UI.toast("Erro ao abrir relatório.", "error");
+                }
+            },
+
+            // Gatilho Automático: Segunda-feira às 8:30
+            verificarRelatorioSemanalAutomatico() {
+                const role = localStorage.getItem('currentRole');
+                if(role !== 'admin') return;
+
+                const now = new Date();
+                const day = now.getDay(); // 0 = Dom, 1 = Seg, etc.
+                const hours = now.getHours();
+                const minutes = now.getMinutes();
+
+                // Se for Segunda-Feira E for 08:30 ou mais tarde
+                if (day === 1 && (hours > 8 || (hours === 8 && minutes >= 30))) {
+                    const todayStr = now.toISOString().slice(0,10);
                     
-                    this.navigate('viewForm');
-                    UI.toast("Formulário limpo.", "info");
+                    // Checa se o relatório de hoje já foi gerado
+                    this.db.ref('settings/lastWeeklyReport').once('value').then(snap => {
+                        const lastGenerated = snap.val();
+                        if(lastGenerated !== todayStr) {
+                            UI.toast("Gerando relatório semanal automático...", "info");
+                            this.gerarRelatorioSemanal().then(() => {
+                                this.db.ref('settings/lastWeeklyReport').set(todayStr);
+                            });
+                        }
+                    });
+                }
+            },
+
+            async gerarRelatorioSemanal() {
+                try {
+                    UI.toast("Buscando dados da última semana...", "info");
+                    
+                    const seteDiasAtras = Date.now() - (7 * 24 * 60 * 60 * 1000);
+                    const snap = await this.db.ref('reports').orderByChild('timestamp').startAt(seteDiasAtras).once('value');
+                    const reports = snap.val() || {};
+                    
+                    const sorted = Object.values(reports).sort((a,b) => a.timestamp - b.timestamp);
+                    
+                    if(sorted.length === 0) {
+                        return UI.toast("Nenhum relatório registrado nos últimos 7 dias.", "warning");
+                    }
+
+                    let corpo = "==========================================================\n";
+                    corpo += "          RELATÓRIO SEMANAL DE TROCA DE TURNO - MAHLE\n";
+                    corpo += "==========================================================\n";
+                    corpo += `Gerado em: ${new Date().toLocaleString('pt-BR')}\n`;
+                    corpo += `Total de registros no período: ${sorted.length}\n\n`;
+
+                    sorted.forEach(fd => {
+                        const dataRegistro = new Date(fd.timestamp).toLocaleString('pt-BR');
+                        corpo += `[${dataRegistro}] - DEPTO: ${fd.depto} (${fd.area})\n`;
+                        corpo += `Passagem: De ${fd.de_nome} (${fd.de_turno}) PARA ${fd.para_nome} (${fd.para_turno})\n`;
+                        corpo += `Registrado no sistema por: ${fd.autor}\n`;
+                        corpo += `----------------------------------------------------------\n`;
+                        corpo += `PRODUÇÃO: ${fd.situacao}\n\n`;
+                        corpo += `DESVIOS: ${fd.desvios}\n\n`;
+                        corpo += `PARADAS: ${fd.paradas}\n\n`;
+                        corpo += `RH / 5S: ${fd.trabalhistas} | ${fd.tpm}\n\n`;
+                        corpo += `GERAL: ${fd.geral}\n`;
+                        corpo += `==========================================================\n\n`;
+                    });
+
+                    // Download do arquivo TXT localmente
+                    const blob = new Blob([corpo], { type: 'text/plain;charset=utf-8' });
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.style.display = 'none';
+                    a.href = url;
+                    a.download = `MAHLE_Relatorio_Semanal_${new Date().toISOString().slice(0,10)}.txt`;
+                    
+                    document.body.appendChild(a);
+                    a.click();
+                    
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                    
+                    UI.toast("Relatório Semanal gerado e baixado com sucesso!", "success");
+                } catch (e) {
+                    console.error(e);
+                    UI.toast("Erro ao gerar relatório semanal.", "error");
                 }
             }
         };
