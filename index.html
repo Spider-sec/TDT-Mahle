@@ -5,52 +5,60 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Troca de Turno - MAHLE</title>
     
-    <!-- Fontes do Google -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- Ícones Material Design -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
     
-    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <style>
-        :root {
-            --primary: #004b87;
-            --primary-dark: #00335e;
-            --secondary: #64748b;
-            --secondary-dark: #475569;
-            --warning: #f59e0b;
-            --warning-dark: #d97706;
-            --danger: #ef4444;
-            --danger-dark: #b91c1c;
-            --success: #10b981;
-            --bg-color: #f1f5f9;
-            --card-bg: #ffffff;
-            --text-main: #1e293b;
-            --text-muted: #64748b;
-            --border: #e2e8f0;
-            --input-bg: #f8fafc;
+        :root { 
+            --primary: #004b87; 
+            --primary-dark: #00335e; 
+            --secondary: #64748b; 
+            --secondary-dark: #475569; 
+            --warning: #f59e0b; 
+            --warning-dark: #d97706; 
+            --danger: #ef4444; 
+            --danger-dark: #b91c1c; 
+            --success: #10b981; 
+            --bg-color: #f1f5f9; 
+            --card-bg: #ffffff; 
+            --text-main: #1e293b; 
+            --text-muted: #64748b; 
+            --border: #e2e8f0; 
+            --input-bg: #f8fafc; 
         }
 
-        * { box-sizing: border-box; font-family: 'Inter', sans-serif; margin: 0; padding: 0; }
-        body { background: var(--bg-color); color: var(--text-main); transition: background 0.3s; }
-        
-        body.login-active {
-            background-image: linear-gradient(rgba(0, 30, 60, 0.85), rgba(0, 30, 60, 0.95)), url('fachada.jpg');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
+        * { 
+            box-sizing: border-box; 
+            font-family: 'Inter', sans-serif; 
+            margin: 0; 
+            padding: 0; 
+        }
+
+        body { 
+            background: var(--bg-color); 
+            color: var(--text-main); 
+            transition: background 0.3s; 
+        }
+
+        body.login-active { 
+            background-image: linear-gradient(rgba(0, 30, 60, 0.85), rgba(0, 30, 60, 0.95)), url('fachada.jpg'); 
+            background-size: cover; 
+            background-position: center; 
+            background-repeat: no-repeat; 
+            background-attachment: fixed; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            min-height: 100vh; 
         }
 
         .app-container { max-width: 1000px; margin: 0 auto; padding: 20px; }
         body.login-active .app-container { padding: 0; width: 100%; max-width: 420px; }
-
+        
         .card { background: var(--card-bg); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); padding: 32px; margin-bottom: 24px; border: 1px solid rgba(255,255,255,0.5); }
         .hidden { display: none !important; }
         
@@ -58,14 +66,13 @@
         .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 2px solid var(--border); }
         .page-title { color: var(--text-main); font-size: 22px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
         .page-title .material-icons-round { color: var(--primary); }
-        
         .section-header { background: var(--primary); color: #fff; padding: 12px 16px; font-size: 13px; font-weight: 600; border-radius: 6px; margin: 32px 0 16px 0; letter-spacing: 0.5px; text-transform: uppercase; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 6px rgba(0,75,135,0.2); }
         
         .form-grid { display: grid; gap: 16px; }
         .grid-col-1 { grid-template-columns: 1fr; }
         .grid-col-2 { grid-template-columns: 1fr 1fr; }
         .grid-col-4 { grid-template-columns: repeat(4, 1fr); }
-
+        
         .form-group { display: flex; flex-direction: column; gap: 6px; }
         label { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.3px; }
         input, textarea, select { width: 100%; padding: 12px 16px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 14px; background: var(--input-bg); color: var(--text-main); transition: all 0.2s; font-weight: 500; }
@@ -77,6 +84,7 @@
         button { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 14px 24px; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 4px 6px rgba(0,0,0,0.1), 0 1px 3px rgba(0,0,0,0.08); }
         button:hover { transform: translateY(-2px); box-shadow: 0 7px 14px rgba(0,0,0,0.15), 0 3px 6px rgba(0,0,0,0.1); }
         button:active { transform: translateY(1px); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        button:disabled { opacity: 0.7; cursor: not-allowed; transform: none; box-shadow: none; }
         
         .btn-primary { background: var(--primary); color: #fff; }
         .btn-primary:hover { background: var(--primary-dark); }
@@ -88,7 +96,6 @@
         .btn-warning:hover { background: var(--warning-dark); }
         .btn-nfc { background: #0284c7; color: #fff; }
         .btn-nfc:hover { background: #0369a1; }
-        
         .btn-sm { padding: 8px 16px; font-size: 12px; }
         .w-100 { width: 100%; }
         
@@ -96,7 +103,7 @@
         .stat-card { background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border: 1px solid var(--border); border-radius: 8px; padding: 16px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         .stat-value { font-size: 24px; font-weight: 800; color: var(--primary); margin-bottom: 4px; }
         .stat-label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
-
+        
         .admin-panel { display: grid; gap: 24px; }
         .admin-card { background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 20px; }
         .full-width { grid-column: 1 / -1; }
@@ -116,7 +123,7 @@
         .p-block:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
         .p-label { font-size: 11px; color: var(--primary); text-transform: uppercase; font-weight: 800; margin-bottom: 6px; }
         .p-value { font-size: 15px; font-weight: 500; color: var(--text-main); white-space: pre-wrap; line-height: 1.5; }
-
+        
         #toast-container { position: fixed; top: 24px; right: 24px; left: 24px; display: flex; flex-direction: column; gap: 10px; z-index: 9999; pointer-events: none; align-items: flex-end; }
         .toast { background: #1e293b; color: #fff; padding: 16px 24px; border-radius: 8px; font-size: 14px; font-weight: 600; box-shadow: 0 10px 25px rgba(0,0,0,0.2); opacity: 0; transform: translateX(50px); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; align-items: center; gap: 12px; max-width: 400px; }
         .toast.show { opacity: 1; transform: translateX(0); }
@@ -124,18 +131,11 @@
         .toast.error { border-left: 6px solid var(--danger); }
         .toast.warning { border-left: 6px solid var(--warning); }
 
-        @media (min-width: 768px) {
-            .app-container { padding: 40px 20px; }
-            #toast-container { left: auto; }
-            .grid-md-2 { grid-template-columns: repeat(2, 1fr); }
-            .grid-md-4 { grid-template-columns: repeat(4, 1fr); }
-            .span-2 { grid-column: span 2; }
-            .span-4 { grid-column: span 4; }
-            .admin-panel { grid-template-columns: 350px 1fr; align-items: start; }
-        }
-        @media (max-width: 767px) {
-            .dashboard-stats { grid-template-columns: 1fr; gap: 12px; }
-        }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        .icon-spin { animation: spin 1s linear infinite; }
+
+        @media (min-width: 768px) { .app-container { padding: 40px 20px; } #toast-container { left: auto; } .grid-md-2 { grid-template-columns: repeat(2, 1fr); } .grid-md-4 { grid-template-columns: repeat(4, 1fr); } .span-2 { grid-column: span 2; } .span-4 { grid-column: span 4; } .admin-panel { grid-template-columns: 350px 1fr; align-items: start; } }
+        @media (max-width: 767px) { .dashboard-stats { grid-template-columns: 1fr; gap: 12px; } }
     </style>
 </head>
 <body>
@@ -143,7 +143,7 @@
     <div id="toast-container"></div>
     
     <div class="app-container">
-
+        
         <!-- TELA DE LOGIN -->
         <div id="viewLogin" class="card hidden" style="margin: 0;">
             <div style="text-align: center; margin-bottom: 32px;">
@@ -152,18 +152,17 @@
             </div>
             
             <div class="form-grid grid-col-1">
-                <!-- Botão de Login por Crachá NFC -->
                 <button class="btn-nfc w-100" onclick="App.loginNFC()" id="btnNfcLogin" style="padding: 16px; margin-bottom: 12px;">
                     <span class="material-icons-round" style="font-size: 22px;">nfc</span> Entrar com Crachá (RFID)
                 </button>
                 
                 <div style="text-align: center; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin: 4px 0 12px 0;">
-                    — Ou acesse com usuário e senha —
+                    — Ou acesse com e-mail e senha —
                 </div>
 
                 <div class="form-group">
-                    <label>Usuário de Acesso</label>
-                    <input type="text" id="loginUser" placeholder="Digite seu usuário" autocapitalize="none">
+                    <label>E-mail Corporativo</label>
+                    <input type="email" id="loginEmail" placeholder="joao.silva@mahle.com" autocapitalize="none">
                 </div>
                 <div class="form-group">
                     <label>Senha de Segurança</label>
@@ -179,14 +178,11 @@
         <div id="viewForm" class="hidden">
             <div class="card">
                 <div class="header-top">
-                    <div class="page-title">
-                        <span class="material-icons-round">assignment</span>
-                        Relatório de Turno
-                    </div>
+                    <div class="page-title"><span class="material-icons-round">assignment</span> Relatório de Turno</div>
                     <div class="mahle-logo" style="font-size: 28px;">MAHLE</div>
                 </div>
                 
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; background: #f8fafc; padding: 12px 16px; border-radius: 8px; border: 1px solid var(--border); box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; background: #f8fafc; padding: 12px 16px; border-radius: 8px; border: 1px solid var(--border);">
                     <div style="font-weight: 600; color: var(--primary); display: flex; align-items: center; gap: 8px;">
                         <span class="material-icons-round" style="font-size: 18px;">account_circle</span>
                         <span id="welcomeText"></span>
@@ -261,7 +257,7 @@
                     <div class="section-header" style="margin-top: 0;">
                         <span class="material-icons-round" style="font-size: 18px;">precision_manufacturing</span> Situação da Produção *
                     </div>
-                    <textarea id="f_situacao" rows="4" placeholder="Relate o status geral das máquinas, planejamento x realizado, defeitos e refugo..." required></textarea>
+                    <textarea id="f_situacao" rows="4" placeholder="Relate o status geral das máquinas..." required></textarea>
                 </div>
 
                 <div class="form-grid grid-col-1 grid-md-2" style="margin-top: 24px;">
@@ -271,7 +267,7 @@
                     </div>
                     <div class="form-group">
                         <div class="section-header" style="margin-top: 0;"><span class="material-icons-round" style="font-size: 18px;">build_circle</span> Paradas (Quebras/Falta de Mat.) *</div>
-                        <textarea id="f_paradas" rows="3" placeholder="Relate as paradas de máquina ou falta de insumos..." required></textarea>
+                        <textarea id="f_paradas" rows="3" placeholder="Relate as paradas de máquina..." required></textarea>
                     </div>
                     <div class="form-group">
                         <div class="section-header" style="margin-top: 0;"><span class="material-icons-round" style="font-size: 18px;">groups</span> Questões Trabalhistas *</div>
@@ -279,11 +275,11 @@
                     </div>
                     <div class="form-group">
                         <div class="section-header" style="margin-top: 0;"><span class="material-icons-round" style="font-size: 18px;">cleaning_services</span> TPM / 5S *</div>
-                        <textarea id="f_tpm" rows="3" placeholder="Status de limpeza, organização da área..." required></textarea>
+                        <textarea id="f_tpm" rows="3" placeholder="Status de limpeza, organização..." required></textarea>
                     </div>
                     <div class="form-group span-2">
                         <div class="section-header" style="margin-top: 0;"><span class="material-icons-round" style="font-size: 18px;">notes</span> Observações Gerais *</div>
-                        <textarea id="f_geral" rows="3" placeholder="Informações adicionais para o próximo turno..." required></textarea>
+                        <textarea id="f_geral" rows="3" placeholder="Informações adicionais..." required></textarea>
                     </div>
                 </div>
 
@@ -298,25 +294,20 @@
             </div>
         </div>
 
-        <!-- TELA DE APRESENTAÇÃO / VISUALIZAÇÃO -->
+        <!-- TELA DE APRESENTAÇÃO -->
         <div id="viewPresentation" class="hidden">
             <div class="card">
                 <div class="header-top">
-                    <div class="page-title">
-                        <span class="material-icons-round">assignment_turned_in</span>
-                        Resumo do Turno
-                    </div>
+                    <div class="page-title"><span class="material-icons-round">assignment_turned_in</span> Resumo do Turno</div>
                     <div class="mahle-logo" style="font-size: 28px;">MAHLE</div>
                 </div>
                 
                 <div id="presentationAlert" style="background: #e0f2fe; color: #0284c7; padding: 16px; border-radius: 8px; margin-bottom: 24px; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 12px; border: 1px solid #bae6fd;">
                     <span class="material-icons-round" style="font-size: 24px;">info</span> 
-                    Apresente esta tela ao responsável pelo próximo turno para a passagem de informações.
+                    Apresente esta tela ao responsável pelo próximo turno.
                 </div>
 
-                <div class="presentation-view" id="presentationContent">
-                    <!-- Preenchido via JS -->
-                </div>
+                <div class="presentation-view" id="presentationContent"></div>
 
                 <div class="btn-group">
                     <button class="btn-secondary w-100" id="btnBackPresentation" onclick="App.voltarDaApresentacao()">
@@ -333,40 +324,31 @@
         <div id="viewAdmin" class="hidden">
             <div class="card">
                 <div class="header-top">
-                    <div class="page-title">
-                        <span class="material-icons-round">dashboard</span>
-                        Painel de Controle
-                    </div>
+                    <div class="page-title"><span class="material-icons-round">dashboard</span> Painel de Controle</div>
                     <button class="btn-secondary btn-sm" onclick="App.navigate('viewForm')">
                         <span class="material-icons-round">arrow_back</span> Voltar
                     </button>
                 </div>
 
                 <div class="dashboard-stats">
-                    <div class="stat-card">
-                        <div class="stat-value" id="statTotal">0</div>
-                        <div class="stat-label">Total de Usuários</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="statAdmins" style="color: #0284c7;">0</div>
-                        <div class="stat-label">Administradores</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value" id="statOps" style="color: var(--secondary);">0</div>
-                        <div class="stat-label">Operadores</div>
-                    </div>
+                    <div class="stat-card"><div class="stat-value" id="statTotal">0</div><div class="stat-label">Total de Usuários</div></div>
+                    <div class="stat-card"><div class="stat-value" id="statAdmins" style="color: #0284c7;">0</div><div class="stat-label">Administradores</div></div>
+                    <div class="stat-card"><div class="stat-value" id="statOps" style="color: var(--secondary);">0</div><div class="stat-label">Operadores</div></div>
                 </div>
 
                 <div class="admin-panel">
-                    <!-- Cadastrar Usuário -->
                     <div class="admin-card">
                         <div class="page-title" style="font-size: 16px; margin-bottom: 20px;">
                             <span class="material-icons-round" style="font-size: 20px;">person_add</span> Cadastrar Usuário
                         </div>
                         <div class="form-grid grid-col-1">
                             <div class="form-group">
-                                <label>Nome de Acesso</label>
-                                <input type="text" id="newUsername" placeholder="Ex: Joao.Silva">
+                                <label>Nome de Exibição</label>
+                                <input type="text" id="newUserName" placeholder="Ex: João Silva">
+                            </div>
+                            <div class="form-group">
+                                <label>E-mail (Login)</label>
+                                <input type="email" id="newUserEmail" placeholder="joao.silva@mahle.com">
                             </div>
                             <div class="form-group">
                                 <label>Senha Provisória</label>
@@ -378,17 +360,12 @@
                         </div>
                     </div>
 
-                    <!-- Lista de Equipe -->
                     <div>
                         <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 16px;">
                             <div class="page-title" style="font-size: 16px;">
                                 <span class="material-icons-round" style="font-size: 20px;">manage_accounts</span> Equipe Cadastrada
                             </div>
-                            <button class="btn-warning btn-sm" onclick="App.limparBloqueios()">
-                                <span class="material-icons-round" style="font-size: 16px;">lock_open</span> Destravar Todos
-                            </button>
                         </div>
-                        
                         <div class="user-table-wrapper">
                             <table class="user-table">
                                 <thead>
@@ -398,14 +375,11 @@
                                         <th style="text-align: right;">Ações</th>
                                     </tr>
                                 </thead>
-                                <tbody id="usersList">
-                                    <!-- Injetado via JS -->
-                                </tbody>
+                                <tbody id="usersList"></tbody>
                             </table>
                         </div>
                     </div>
 
-                    <!-- Histórico de Relatórios -->
                     <div class="admin-card full-width" style="margin-top: 16px;">
                         <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 16px;">
                             <div class="page-title" style="font-size: 16px;">
@@ -426,9 +400,7 @@
                                         <th style="text-align: right;">Ações</th>
                                     </tr>
                                 </thead>
-                                <tbody id="reportsList">
-                                    <!-- Injetado via JS -->
-                                </tbody>
+                                <tbody id="reportsList"></tbody>
                             </table>
                         </div>
                     </div>
@@ -438,9 +410,8 @@
     </div>
 
     <script>
-        /** 
-         * ARQUITETURA CLEAN CODE - TDT MAHLE COM SUPORTE WEB NFC E HISTÓRICO BD
-         */
+        const el = id => document.getElementById(id);
+
         const Config = {
             firebase: {
                 apiKey: "AIzaSyARfglCAGb4ITePr4ede_jBaTJpTEHrxnk",
@@ -452,138 +423,108 @@
                 appId: "1:802974828568:web:84f6a42464159574d65b6d"
             },
             emailDestino: "supervisao@mahle.com",
-            superAdmin: "Mizael",
-            salt: "Mahle_Sec_TDT_2026!@", 
-            sessionTimeout: 12 * 60 * 60 * 1000 
+            nfcSalt: "Mahle_NFC_Sec_2026!@" 
         };
 
-        const Security = {
-            async hash(password) {
-                const msgBuffer = new TextEncoder().encode(Config.salt + password);
+        const Utils = {
+            async hashNFC(serialNumber) {
+                const msgBuffer = new TextEncoder().encode(Config.nfcSalt + serialNumber);
                 const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
                 const hashArray = Array.from(new Uint8Array(hashBuffer));
                 return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
             },
-            sanitize(str) {
+            escapeHTML(str) {
                 const div = document.createElement('div');
-                div.appendChild(document.createTextNode(str || ''));
+                div.textContent = str || '';
                 return div.innerHTML;
             }
         };
 
-        const UI = {
-            toast(msg, type = 'info') {
-                const container = document.getElementById('toast-container');
-                const el = document.createElement('div');
-                el.className = `toast ${type}`;
+        const Notify = {
+            show(msg, type = 'info') {
+                const container = el('toast-container');
+                const elToast = document.createElement('div');
+                elToast.className = `toast ${type}`;
                 
-                let icon = 'info';
-                if(type === 'success') icon = 'check_circle';
-                if(type === 'error') icon = 'warning';
-                if(type === 'warning') icon = 'error_outline';
+                const icon = type === 'success' ? 'check_circle' : 
+                            (type === 'error' ? 'warning' : 
+                            (type === 'warning' ? 'error_outline' : 'info'));
+                            
+                elToast.innerHTML = `<span class="material-icons-round">${icon}</span> <span>${msg}</span>`;
+                container.appendChild(elToast);
                 
-                el.innerHTML = `<span class="material-icons-round">${icon}</span> <span>${msg}</span>`;
-                container.appendChild(el);
-                
-                requestAnimationFrame(() => { el.classList.add('show'); });
+                requestAnimationFrame(() => elToast.classList.add('show'));
                 
                 setTimeout(() => {
-                    el.classList.remove('show');
-                    setTimeout(() => el.remove(), 300);
+                    elToast.classList.remove('show');
+                    setTimeout(() => elToast.remove(), 300);
                 }, 3500);
             },
             setLoading(btnId, isLoading) {
-                const btn = document.getElementById(btnId);
-                if(isLoading) {
+                const btn = el(btnId);
+                if (isLoading) {
                     btn.dataset.original = btn.innerHTML;
-                    btn.innerHTML = `<span class="material-icons-round" style="animation: spin 1s linear infinite;">autorenew</span> Aguarde...`;
+                    btn.innerHTML = `<span class="material-icons-round icon-spin">autorenew</span> Aguarde...`;
                     btn.disabled = true;
-                    btn.style.opacity = '0.7';
                 } else {
                     btn.innerHTML = btn.dataset.original;
                     btn.disabled = false;
-                    btn.style.opacity = '1';
                 }
-            },
-            setBackground(isLogin) {
-                if(isLogin) document.body.classList.add('login-active');
-                else document.body.classList.remove('login-active');
             }
         };
 
         const App = {
             db: null,
-            isReady: false,
+            currentUser: null,
+            userData: null,
             viewingHistory: false,
+            secondaryApp: null,
 
-            async init() {
+            init() {
                 firebase.initializeApp(Config.firebase);
                 this.db = firebase.database();
                 
-                try {
-                    const adminHash = await Security.hash('37051064');
-                    await this.db.ref('users/' + Config.superAdmin).set({ 
-                        username: Config.superAdmin, 
-                        password: adminHash, 
-                        role: 'admin' 
-                    });
-                    
-                    this.isReady = true;
-                    this.checkSession();
-                } catch (error) {
-                    UI.toast("Erro de conexão com o servidor seguro.", "error");
-                    console.error(error);
-                }
-            },
+                // Instância secundária para o painel admin registrar novos usuários sem sobrescrever a sessão local
+                this.secondaryApp = firebase.initializeApp(Config.firebase, "Secondary");
 
-            checkSession() {
-                const user = localStorage.getItem('currentUser');
-                const role = localStorage.getItem('currentRole');
-                const loginTime = localStorage.getItem('loginTime');
-
-                if (user && loginTime) {
-                    if (Date.now() - parseInt(loginTime) > Config.sessionTimeout) {
-                        this.logout(false);
-                        UI.toast("Sessão expirada. Faça login novamente.", "error");
-                        return;
+                firebase.auth().onAuthStateChanged(async (user) => {
+                    if (user) {
+                        this.currentUser = user;
+                        try {
+                            const snap = await this.db.ref(`users/${user.uid}`).once('value');
+                            this.userData = snap.val() || { nome: user.email, role: 'operator' };
+                            
+                            el('welcomeText').innerText = this.userData.nome;
+                            el('f_de_nome').value = this.userData.nome;
+                            
+                            this.configureRoleUI(this.userData.role);
+                            this.verificarRelatorioSemanal();
+                            this.navigate('viewForm');
+                        } catch (err) {
+                            Notify.show("Erro ao buscar permissões.", "error");
+                        }
+                    } else {
+                        this.currentUser = null;
+                        this.userData = null;
+                        this.navigate('viewLogin');
                     }
-                    
-                    document.getElementById('welcomeText').innerText = `${user}`;
-                    this.configureRoleUI(role);
-                    
-                    const fDeNome = document.getElementById('f_de_nome');
-                    if(!fDeNome.value) fDeNome.value = user;
-
-                    this.verificarRelatorioSemanalAutomatico();
-                    this.navigate('viewForm');
-                } else {
-                    this.navigate('viewLogin');
-                }
+                });
             },
 
             configureRoleUI(role) {
-                const btnAdminMenu = document.getElementById('btnAdmin');
-                const btnEnviarAdmin = document.getElementById('btnEnviarAdmin');
-                const btnSalvarOp = document.getElementById('btnSalvarOp');
-
-                if (role === 'admin') {
-                    btnAdminMenu.classList.remove('hidden');
-                    btnEnviarAdmin.classList.remove('hidden');
-                    btnSalvarOp.classList.add('hidden');
-                } else {
-                    btnAdminMenu.classList.add('hidden');
-                    btnEnviarAdmin.classList.add('hidden');
-                    btnSalvarOp.classList.remove('hidden');
-                }
+                const isAdmin = role === 'admin';
+                el('btnAdmin').classList.toggle('hidden', !isAdmin);
+                el('btnEnviarAdmin').classList.toggle('hidden', !isAdmin);
+                el('btnSalvarOp').classList.toggle('hidden', isAdmin);
             },
 
             navigate(viewId) {
                 ['viewLogin', 'viewForm', 'viewAdmin', 'viewPresentation'].forEach(id => {
-                    document.getElementById(id).classList.add('hidden');
+                    el(id).classList.add('hidden');
                 });
-                document.getElementById(viewId).classList.remove('hidden');
                 
-                UI.setBackground(viewId === 'viewLogin');
+                el(viewId).classList.remove('hidden');
+                document.body.classList.toggle('login-active', viewId === 'viewLogin');
                 
                 if (viewId === 'viewAdmin') {
                     this.renderUserList();
@@ -592,132 +533,66 @@
             },
 
             async login() {
-                if (!this.isReady) return UI.toast("Conectando ao servidor...", "info");
+                const email = el('loginEmail').value.trim();
+                const pass = el('loginPass').value;
                 
-                const user = document.getElementById('loginUser').value.trim();
-                const pass = document.getElementById('loginPass').value;
-                
-                if (!user || !pass) return UI.toast("Preencha todos os campos.", "warning");
+                if (!email || !pass) return Notify.show("Preencha e-mail e senha.", "warning");
 
-                UI.setLoading('btnLogin', true);
-
+                Notify.setLoading('btnLogin', true);
                 try {
-                    const attemptRef = this.db.ref('attempts/' + user);
-                    const attemptSnap = await attemptRef.once('value');
-                    let attempts = attemptSnap.exists() ? attemptSnap.val() : { count: 0, lockedUntil: 0 };
-
-                    if (Date.now() < attempts.lockedUntil) {
-                        const mins = Math.ceil((attempts.lockedUntil - Date.now()) / 60000);
-                        UI.toast(`Conta bloqueada. Aguarde ${mins} min.`, "error");
-                        return UI.setLoading('btnLogin', false);
-                    }
-
-                    const userSnap = await this.db.ref('users/' + user).once('value');
-                    
-                    if (userSnap.exists()) {
-                        const dbUser = userSnap.val();
-                        const hashedInput = await Security.hash(pass);
-                        
-                        if (dbUser.password === hashedInput) {
-                            await attemptRef.set({ count: 0, lockedUntil: 0 }); 
-                            localStorage.setItem('currentUser', dbUser.username);
-                            localStorage.setItem('currentRole', dbUser.role);
-                            localStorage.setItem('loginTime', Date.now().toString());
-                            window.location.reload();
-                            return;
-                        }
-                    }
-
-                    attempts.count += 1;
-                    if (attempts.count >= 8) {
-                        attempts.lockedUntil = Date.now() + (15 * 60 * 1000); 
-                        UI.toast("8 falhas. Conta bloqueada por 15 min.", "error");
-                    } else {
-                        UI.toast(`Senha incorreta. Tentativa ${attempts.count}/8.`, "error");
-                    }
-                    await attemptRef.set(attempts);
-
-                } catch (error) {
-                    UI.toast("Falha na comunicação com banco.", "error");
+                    await firebase.auth().signInWithEmailAndPassword(email, pass);
+                } catch (err) {
+                    Notify.show("E-mail ou senha incorretos.", "error");
                 } finally {
-                    UI.setLoading('btnLogin', false);
+                    Notify.setLoading('btnLogin', false);
                 }
             },
 
             async loginNFC() {
-                if (!('NDEFReader' in window)) {
-                    return UI.toast("NFC não suportado neste aparelho ou navegador.", "warning");
-                }
-
-                UI.toast("Aproxime o crachá da traseira do celular...", "info");
+                if (!('NDEFReader' in window)) return Notify.show("NFC não suportado neste aparelho.", "warning");
+                
+                Notify.show("Aproxime o crachá da traseira do celular...", "info");
 
                 try {
                     const ndef = new NDEFReader();
                     await ndef.scan();
                     
                     ndef.addEventListener("reading", async ({ serialNumber }) => {
-                        if (!serialNumber) return UI.toast("Não foi possível ler o ID do crachá.", "error");
+                        if (!serialNumber) return Notify.show("Falha na leitura.", "error");
                         
-                        const hashedNfc = await Security.hash(serialNumber);
+                        const hashedNfc = await Utils.hashNFC(serialNumber);
+                        const nfcSnap = await this.db.ref(`nfc_tags/${hashedNfc}`).once('value');
                         
-                        const usersSnap = await this.db.ref('users').once('value');
-                        const users = usersSnap.val() || {};
-                        
-                        let foundUser = null;
-                        Object.values(users).forEach(u => {
-                            if (u.nfcTag === hashedNfc) foundUser = u;
-                        });
-
-                        if (foundUser) {
-                            localStorage.setItem('currentUser', foundUser.username);
-                            localStorage.setItem('currentRole', foundUser.role);
-                            localStorage.setItem('loginTime', Date.now().toString());
-                            UI.toast(`Crachá reconhecido! Bem-vindo, ${foundUser.username}.`, "success");
-                            setTimeout(() => window.location.reload(), 1000);
+                        if (nfcSnap.exists()) {
+                            const emailVinculado = nfcSnap.val();
+                            const senha = prompt(`Crachá reconhecido (${emailVinculado}).\nDigite sua senha de segurança para confirmar:`);
+                            
+                            if (senha) {
+                                Notify.show("Autenticando...", "info");
+                                try {
+                                    await firebase.auth().signInWithEmailAndPassword(emailVinculado, senha);
+                                } catch (e) {
+                                    Notify.show("Senha incorreta.", "error");
+                                }
+                            } else {
+                                Notify.show("Login cancelado.", "warning");
+                            }
                         } else {
-                            UI.toast("Crachá não cadastrado no sistema.", "error");
+                            Notify.show("Crachá não cadastrado no sistema.", "error");
                         }
-                    });
-
-                } catch (error) {
-                    UI.toast("Erro ao ativar leitor de crachá.", "error");
+                    }, { once: true });
+                } catch (err) {
+                    Notify.show("Erro ao ativar NFC.", "error");
                 }
             },
 
-            async cadastrarNFC(username) {
-                if (!('NDEFReader' in window)) {
-                    return UI.toast("Este celular não possui suporte a NFC.", "warning");
-                }
-
-                UI.toast(`Aproxime o crachá de ${username} para registrar...`, "info");
-
-                try {
-                    const ndef = new NDEFReader();
-                    await ndef.scan();
-                    
-                    ndef.addEventListener("reading", async ({ serialNumber }) => {
-                        if (!serialNumber) return UI.toast("Falha ao capturar código do crachá.", "error");
-                        
-                        const hashedNfc = await Security.hash(serialNumber);
-                        await this.db.ref(`users/${username}/nfcTag`).set(hashedNfc);
-                        
-                        UI.toast(`Crachá vinculado com sucesso a ${username}!`, "success");
-                        this.renderUserList();
-                    }, { once: true }); 
-
-                } catch (error) {
-                    UI.toast("Cancelado ou erro ao ler crachá.", "error");
-                }
-            },
-
-            logout(reload = true) {
-                localStorage.clear();
-                if(reload) window.location.reload();
+            logout() {
+                firebase.auth().signOut().then(() => window.location.reload());
             },
             
             handleDeptoChange() {
-                const depto = document.getElementById('f_depto').value;
-                const area = document.getElementById('f_area');
+                const depto = el('f_depto').value;
+                const area = el('f_area');
                 
                 if (depto === 'Injetora') {
                     area.disabled = false;
@@ -729,22 +604,17 @@
                     `;
                 } else {
                     area.disabled = true;
-                    area.innerHTML = `<option value="N/A" selected>Bloqueado (Apenas Injetora)</option>`;
+                    area.innerHTML = `<option value="N/A" selected>Bloqueado</option>`;
                 }
             },
 
             validateForm() {
-                const fields = [
-                    'f_data', 'f_depto', 'f_area', 'f_para_nome', 'f_de_nome', 
-                    'f_de_turno', 'f_para_turno', 'f_situacao', 'f_desvios', 
-                    'f_paradas', 'f_trabalhistas', 'f_tpm', 'f_geral'
-                ];
-
+                const fields = ['f_data', 'f_depto', 'f_area', 'f_para_nome', 'f_de_nome', 'f_de_turno', 'f_para_turno', 'f_situacao', 'f_desvios', 'f_paradas', 'f_trabalhistas', 'f_tpm', 'f_geral'];
                 for (let id of fields) {
-                    const el = document.getElementById(id);
-                    if (!el.value || el.value === '' || (el.value === 'N/A' && id !== 'f_area')) {
-                        el.focus();
-                        UI.toast("Preencha todos os campos obrigatórios.", "warning");
+                    const node = el(id);
+                    if (!node.value || node.value === '' || (node.value === 'N/A' && id !== 'f_area')) {
+                        node.focus();
+                        Notify.show("Preencha todos os campos obrigatórios.", "warning");
                         return false;
                     }
                 }
@@ -752,10 +622,7 @@
             },
 
             getFormData() {
-                const getVal = (id) => {
-                    const el = document.getElementById(id);
-                    return el.disabled ? "N/A" : el.value;
-                };
+                const getVal = id => el(id).disabled ? "N/A" : el(id).value;
                 return {
                     data: getVal('f_data'), depto: getVal('f_depto'), area: getVal('f_area'),
                     de_nome: getVal('f_de_nome'), para_nome: getVal('f_para_nome'),
@@ -766,134 +633,99 @@
                 };
             },
 
-            // ===== BANCO DE DADOS DE RELATÓRIOS =====
             async salvarRelatorioBD() {
-                const fd = this.getFormData();
-                fd.timestamp = Date.now();
-                fd.autor = localStorage.getItem('currentUser');
+                const data = this.getFormData();
+                data.timestamp = Date.now();
+                data.autorNome = this.userData.nome;
+                data.authorId = this.currentUser.uid;
                 
                 try {
-                    await this.db.ref('reports').push(fd);
+                    await this.db.ref('reports').push(data);
                     return true;
-                } catch(e) {
-                    console.error(e);
-                    UI.toast("Erro ao salvar relatório no banco de dados.", "error");
+                } catch (err) {
+                    Notify.show("Erro de permissão ao salvar.", "error");
                     return false;
                 }
             },
             
             async enviarRelatorio() {
-                if(!this.validateForm()) return;
-                
-                const salvo = await this.salvarRelatorioBD();
-                if(!salvo) return;
+                if (!this.validateForm() || !await this.salvarRelatorioBD()) return;
 
-                const fd = this.getFormData();
-                const assunto = `Relatório de Troca de Turno - ${fd.data} (${fd.depto})`;
+                const d = this.getFormData();
+                const assunto = `Relatório de Troca de Turno - ${d.data} (${d.depto})`;
                 const corpo = `
 ==== RELATÓRIO DE TROCA DE TURNO - MAHLE ====
-Data: ${fd.data} | Departamento: ${fd.depto}
-Área de Produção: ${fd.area}
-
+Data: ${d.data} | Departamento: ${d.depto}
+Área de Produção: ${d.area}
 [LIDERANÇA]
-De: ${fd.de_nome} (${fd.de_turno})
-Para: ${fd.para_nome} (${fd.para_turno})
+De: ${d.de_nome} (${d.de_turno})
+Para: ${d.para_nome} (${d.para_turno})
 
-[1. SITUAÇÃO DA PRODUÇÃO]
-${fd.situacao}
-
-[2. DESVIOS DE PROCESSO]
-${fd.desvios}
-
-[3. PARADAS E QUEBRAS]
-${fd.paradas}
-
-[4. QUESTÕES TRABALHISTAS]
-${fd.trabalhistas}
-
-[5. TPM / 5S]
-${fd.tpm}
-
-[6. OBSERVAÇÕES GERAIS]
-${fd.geral}
-=============================================
-(Registrado sistemicamente por: ${localStorage.getItem('currentUser')})
+[SITUAÇÃO DA PRODUÇÃO]
+${d.situacao}
                 `;
-
-                const link = `mailto:${Config.emailDestino}?subject=${encodeURIComponent(assunto)}&body=${encodeURIComponent(corpo.trim())}`;
-                window.location.href = link;
-                UI.toast("Salvo no sistema e aplicativo de e-mail aberto!", "success");
+                window.location.href = `mailto:${Config.emailDestino}?subject=${encodeURIComponent(assunto)}&body=${encodeURIComponent(corpo.trim())}`;
+                Notify.show("Salvo no sistema e e-mail aberto!", "success");
             },
 
             async gerarApresentacao() {
-                if(!this.validateForm()) return;
-                
-                const salvo = await this.salvarRelatorioBD();
-                if(!salvo) return;
-
-                const fd = this.getFormData();
-                this.renderizarVisualizacao(fd, true);
-                UI.toast("Formulário salvo no sistema e pronto para apresentação.", "success");
+                if (!this.validateForm() || !await this.salvarRelatorioBD()) return;
+                this.renderizarVisualizacao(this.getFormData(), true);
+                Notify.show("Relatório salvo e pronto para apresentação.", "success");
             },
 
-            renderizarVisualizacao(fd, isNew) {
+            renderizarVisualizacao(data, isNew) {
+                const eHTML = Utils.escapeHTML;
+                
                 const html = `
                     <div class="form-grid grid-col-2" style="margin-bottom: 24px;">
-                        <div><div class="p-label">Data do Turno</div><div class="p-value">${fd.data}</div></div>
-                        <div><div class="p-label">Departamento / Área</div><div class="p-value">${fd.depto} - ${fd.area}</div></div>
+                        <div>
+                            <div class="p-label">Data do Turno</div>
+                            <div class="p-value">${eHTML(data.data)}</div>
+                        </div>
+                        <div>
+                            <div class="p-label">Departamento / Área</div>
+                            <div class="p-value">${eHTML(data.depto)} - ${eHTML(data.area)}</div>
+                        </div>
                     </div>
                     
                     <div class="p-block">
                         <div class="p-label">Passagem de Turno</div>
-                        <div class="p-value">De: <b>${fd.de_nome}</b> (${fd.de_turno})<br>Para: <b>${fd.para_nome}</b> (${fd.para_turno})</div>
+                        <div class="p-value">
+                            De: <b>${eHTML(data.de_nome)}</b> (${eHTML(data.de_turno)})<br>
+                            Para: <b>${eHTML(data.para_nome)}</b> (${eHTML(data.para_turno)})
+                        </div>
                     </div>
-
-                    <div class="p-block">
-                        <div class="p-label">Situação da Produção</div>
-                        <div class="p-value">${fd.situacao}</div>
-                    </div>
-
-                    <div class="p-block">
-                        <div class="p-label">Desvios de Processo</div>
-                        <div class="p-value">${fd.desvios}</div>
-                    </div>
-
-                    <div class="p-block">
-                        <div class="p-label">Paradas / Quebras</div>
-                        <div class="p-value">${fd.paradas}</div>
-                    </div>
-
+                    
+                    <div class="p-block"><div class="p-label">Situação da Produção</div><div class="p-value">${eHTML(data.situacao)}</div></div>
+                    <div class="p-block"><div class="p-label">Desvios de Processo</div><div class="p-value">${eHTML(data.desvios)}</div></div>
+                    <div class="p-block"><div class="p-label">Paradas / Quebras</div><div class="p-value">${eHTML(data.paradas)}</div></div>
+                    
                     <div class="p-block">
                         <div class="p-label">Questões Trabalhistas & TPM / 5S</div>
-                        <div class="p-value"><b>RH:</b> ${fd.trabalhistas}<br><br><b>5S:</b> ${fd.tpm}</div>
+                        <div class="p-value"><b>RH:</b> ${eHTML(data.trabalhistas)}<br><br><b>5S:</b> ${eHTML(data.tpm)}</div>
                     </div>
-
+                    
                     <div class="p-block" style="border:none;">
                         <div class="p-label">Geral</div>
-                        <div class="p-value">${fd.geral}</div>
+                        <div class="p-value">${eHTML(data.geral)}</div>
                     </div>
+                    
                     <div style="font-size:11px; color:var(--text-muted); text-align:right; border-top: 1px solid var(--border); padding-top: 12px; margin-top: 12px;">
-                        Registrado por: <b>${fd.autor || localStorage.getItem('currentUser')}</b> em ${fd.timestamp ? new Date(fd.timestamp).toLocaleString('pt-BR') : 'Agora'}
+                        Registrado por: <b>${eHTML(data.autorNome || this.userData.nome)}</b>
                     </div>
                 `;
 
-                document.getElementById('presentationContent').innerHTML = html;
+                el('presentationContent').innerHTML = html;
                 
-                // Adjust view based on context (Creating new vs viewing history)
                 this.viewingHistory = !isNew;
-                if(isNew) {
-                    document.getElementById('presentationAlert').classList.remove('hidden');
-                    document.getElementById('btnNewTurno').classList.remove('hidden');
-                } else {
-                    document.getElementById('presentationAlert').classList.add('hidden');
-                    document.getElementById('btnNewTurno').classList.add('hidden');
-                }
-
+                el('presentationAlert').classList.toggle('hidden', !isNew);
+                el('btnNewTurno').classList.toggle('hidden', !isNew);
                 this.navigate('viewPresentation');
             },
 
             voltarDaApresentacao() {
-                if(this.viewingHistory) {
+                if (this.viewingHistory) {
                     this.viewingHistory = false;
                     this.navigate('viewAdmin');
                 } else {
@@ -902,232 +734,189 @@ ${fd.geral}
             },
 
             limparFormulario() {
-                if(confirm("Deseja iniciar um novo turno? Os dados em tela serão limpos (já estão salvos no sistema).")) {
-                    document.querySelectorAll('#viewForm input, #viewForm textarea, #viewForm select').forEach(el => {
-                        if(el.id !== 'f_de_nome') el.value = '';
+                if (confirm("Deseja iniciar um novo turno?")) {
+                    document.querySelectorAll('#viewForm input, #viewForm textarea, #viewForm select').forEach(node => {
+                        if (node.id !== 'f_de_nome') node.value = '';
                     });
                     
-                    document.getElementById('f_depto').value = '';
-                    document.getElementById('f_de_turno').value = '';
-                    document.getElementById('f_para_turno').value = '';
-                    this.handleDeptoChange();
+                    el('f_depto').value = '';
+                    el('f_de_turno').value = '';
+                    el('f_para_turno').value = '';
                     
+                    this.handleDeptoChange();
                     this.navigate('viewForm');
                 }
             },
 
-            // ===== PAINEL DE GESTÃO - USUÁRIOS =====
             async criarUsuario() {
-                const newUser = document.getElementById('newUsername').value.trim();
-                const newPass = document.getElementById('newPassword').value;
+                const nome = el('newUserName').value.trim();
+                const email = el('newUserEmail').value.trim();
+                const pass = el('newPassword').value;
 
-                if (!newUser || !newPass) return UI.toast("Preencha nome e senha.", "warning");
+                if (!nome || !email || !pass) return Notify.show("Preencha todos os campos.", "warning");
 
                 try {
-                    const userSnap = await this.db.ref('users/' + newUser).once('value');
-                    if (userSnap.exists()) return UI.toast("Usuário já cadastrado.", "error");
+                    const cred = await this.secondaryApp.auth().createUserWithEmailAndPassword(email, pass);
+                    await this.db.ref(`users/${cred.user.uid}`).set({ nome, email, role: 'operator' });
+                    await this.secondaryApp.auth().signOut();
 
-                    const hashedPass = await Security.hash(newPass);
-                    await this.db.ref('users/' + newUser).set({
-                        username: newUser,
-                        password: hashedPass,
-                        role: 'operator'
-                    });
-
-                    UI.toast(`Usuário ${newUser} criado!`, "success");
-                    document.getElementById('newUsername').value = '';
-                    document.getElementById('newPassword').value = '';
+                    Notify.show(`Usuário ${nome} criado!`, "success");
+                    
+                    el('newUserName').value = '';
+                    el('newUserEmail').value = '';
+                    el('newPassword').value = '';
                     this.renderUserList(); 
-                } catch (error) {
-                    UI.toast("Erro ao registrar no banco.", "error");
+                } catch (err) {
+                    Notify.show(err.message, "error"); 
                 }
             },
 
-            async limparBloqueios() {
-                try {
-                    await this.db.ref('attempts').remove();
-                    UI.toast("Tentativas falhas zeradas para toda a equipe.", "success");
-                } catch (error) {
-                    UI.toast("Falha ao zerar bloqueios.", "error");
-                }
-            },
+            async cadastrarNFC(uid, userEmail) {
+                if (!('NDEFReader' in window)) return Notify.show("Sem suporte a NFC.", "warning");
+                
+                Notify.show(`Aproxime o crachá para vincular a ${userEmail}...`, "info");
 
-            async resetPassword(username) {
-                if(username === Config.superAdmin) return UI.toast("Proibido alterar senha do Super Admin por aqui.", "error");
-                
-                const newPass = prompt(`Digite a nova senha para o usuário ${username}:`);
-                if (newPass === null || newPass.trim() === '') return;
-                
                 try {
-                    const hashedPass = await Security.hash(newPass.trim());
-                    await this.db.ref(`users/${username}/password`).set(hashedPass);
-                    UI.toast(`Senha de ${username} redefinida com sucesso!`, "success");
-                } catch (e) {
-                    UI.toast("Erro ao redefinir a senha.", "error");
+                    const ndef = new NDEFReader();
+                    await ndef.scan();
+                    
+                    ndef.addEventListener("reading", async ({ serialNumber }) => {
+                        if (!serialNumber) return Notify.show("Falha ao ler crachá.", "error");
+                        
+                        const hashedNfc = await Utils.hashNFC(serialNumber);
+                        
+                        await this.db.ref(`users/${uid}/hasNfc`).set(true);
+                        await this.db.ref(`nfc_tags/${hashedNfc}`).set(userEmail);
+                        
+                        Notify.show(`Crachá vinculado!`, "success");
+                        this.renderUserList();
+                    }, { once: true }); 
+                } catch (err) {
+                    Notify.show("Erro ao ler crachá.", "error");
                 }
             },
 
             async renderUserList() {
-                const listEl = document.getElementById('usersList');
+                const listEl = el('usersList');
                 listEl.innerHTML = '<tr><td colspan="3" style="text-align:center; color: var(--text-muted);">Carregando equipe...</td></tr>';
                 
                 try {
                     const snap = await this.db.ref('users').once('value');
                     const users = snap.val() || {};
-                    let html = '';
-                    
-                    let countTotal = 0, countAdmin = 0, countOp = 0;
+                    let html = '', countTotal = 0, countAdmin = 0, countOp = 0;
 
-                    Object.values(users).forEach(u => {
+                    Object.entries(users).forEach(([uid, u]) => {
                         countTotal++;
                         const isAdmin = u.role === 'admin';
-                        if (isAdmin) countAdmin++; else countOp++;
-
-                        const isSuper = u.username === Config.superAdmin;
-                        const hasNfc = !!u.nfcTag;
+                        isAdmin ? countAdmin++ : countOp++;
+                        const isMe = uid === this.currentUser.uid;
                         
-                        let actionBtns = '';
-                        if (!isSuper) {
-                            actionBtns = `
-                                <button class="btn-nfc btn-sm" title="${hasNfc ? 'Crachá Vinculado (Clique p/ Recadastrar)' : 'Vincular Crachá'}" style="padding: 6px; min-width: 32px;" onclick="App.cadastrarNFC('${u.username}')">
-                                    <span class="material-icons-round" style="font-size: 16px;">${hasNfc ? 'nfc' : 'add_card'}</span>
-                                </button>
-                                <button class="btn-secondary btn-sm" title="Mudar Nível" style="padding: 6px; min-width: 32px;" onclick="App.toggleRole('${u.username}', '${u.role}')">
-                                    <span class="material-icons-round" style="font-size: 16px;">${isAdmin ? 'arrow_downward' : 'arrow_upward'}</span>
-                                </button>
-                                <button class="btn-warning btn-sm" title="Redefinir Senha" style="padding: 6px; min-width: 32px;" onclick="App.resetPassword('${u.username}')">
-                                    <span class="material-icons-round" style="font-size: 16px;">key</span>
-                                </button>
-                                <button class="btn-danger btn-sm" title="Excluir Usuário" style="padding: 6px; min-width: 32px;" onclick="App.deleteUser('${u.username}')">
-                                    <span class="material-icons-round" style="font-size: 16px;">delete</span>
-                                </button>
-                            `;
-                        } else {
-                            actionBtns = `<span style="font-size: 11px; font-weight: 800; color: var(--primary);">SUPER ADMIN</span>`;
-                        }
+                        const actionBtns = `
+                            <button class="btn-nfc btn-sm" title="Vincular Crachá" style="padding: 6px; min-width: 32px;" onclick="App.cadastrarNFC('${uid}', '${u.email}')">
+                                <span class="material-icons-round" style="font-size: 16px;">${u.hasNfc ? 'nfc' : 'add_card'}</span>
+                            </button>
+                            <button class="btn-secondary btn-sm" title="Mudar Nível" style="padding: 6px; min-width: 32px;" onclick="App.toggleRole('${uid}', '${u.role}')" ${isMe ? 'disabled' : ''}>
+                                <span class="material-icons-round" style="font-size: 16px;">${isAdmin ? 'arrow_downward' : 'arrow_upward'}</span>
+                            </button>
+                            <button class="btn-danger btn-sm" title="Excluir Usuário" style="padding: 6px; min-width: 32px;" onclick="App.deleteUser('${uid}')" ${isMe ? 'disabled' : ''}>
+                                <span class="material-icons-round" style="font-size: 16px;">delete</span>
+                            </button>
+                        `;
 
                         html += `
                         <tr>
                             <td>
                                 <div style="display:flex; align-items:center; gap:8px;">
                                     <span class="material-icons-round" style="font-size: 20px; color: var(--secondary);">account_circle</span>
-                                    <span style="font-weight: 600;">${Security.sanitize(u.username)}</span>
-                                    ${hasNfc ? '<span class="material-icons-round" style="font-size:16px; color:#0284c7;" title="Crachá RFID Vinculado">nfc</span>' : ''}
+                                    <div>
+                                        <div style="font-weight: 600;">${Utils.escapeHTML(u.nome)}</div>
+                                        <div style="font-size: 11px; color: var(--text-muted);">${Utils.escapeHTML(u.email)}</div>
+                                    </div>
                                 </div>
                             </td>
-                            <td><span class="badge ${isAdmin ? 'badge-admin' : 'badge-op'}"><span class="material-icons-round" style="font-size: 14px;">${isAdmin ? 'shield' : 'engineering'}</span> ${isAdmin ? 'Administrador' : 'Operador'}</span></td>
+                            <td><span class="badge ${isAdmin ? 'badge-admin' : 'badge-op'}"><span class="material-icons-round" style="font-size: 14px;">${isAdmin ? 'shield' : 'engineering'}</span> ${isAdmin ? 'Admin' : 'Op'}</span></td>
                             <td style="text-align: right; display: flex; justify-content: flex-end; gap: 6px;">${actionBtns}</td>
                         </tr>`;
                     });
                     
-                    document.getElementById('statTotal').innerText = countTotal;
-                    document.getElementById('statAdmins').innerText = countAdmin;
-                    document.getElementById('statOps').innerText = countOp;
+                    el('statTotal').innerText = countTotal;
+                    el('statAdmins').innerText = countAdmin;
+                    el('statOps').innerText = countOp;
                     listEl.innerHTML = html;
-                } catch (e) {
-                    listEl.innerHTML = '<tr><td colspan="3" style="text-align:center; color: var(--danger);">Erro ao carregar lista.</td></tr>';
+                } catch (err) {
+                    listEl.innerHTML = '<tr><td colspan="3" style="text-align:center; color: var(--danger);">Erro de permissão.</td></tr>';
                 }
             },
 
-            async toggleRole(username, currentRole) {
-                if(username === Config.superAdmin) return UI.toast("Super Admin não pode ser alterado.", "error");
-                
+            async toggleRole(uid, currentRole) {
                 const newRole = currentRole === 'admin' ? 'operator' : 'admin';
                 try {
-                    await this.db.ref(`users/${username}/role`).set(newRole);
-                    UI.toast(`Permissões de ${username} atualizadas!`, "success");
+                    await this.db.ref(`users/${uid}/role`).set(newRole);
+                    Notify.show(`Permissões atualizadas!`, "success");
                     this.renderUserList();
-                } catch (e) {
-                    UI.toast("Erro ao alterar permissão.", "error");
+                } catch (err) {
+                    Notify.show("Erro ao alterar permissão.", "error");
                 }
             },
 
-            async deleteUser(username) {
-                if(username === Config.superAdmin) return UI.toast("Proibido excluir Super Admin.", "error");
-                
-                if(confirm(`Tem certeza que deseja excluir permanentemente o acesso de ${username}?`)) {
+            async deleteUser(uid) {
+                if (confirm(`Desativar o acesso deste usuário ao banco de dados?`)) {
                     try {
-                        await this.db.ref(`users/${username}`).remove();
-                        await this.db.ref(`attempts/${username}`).remove();
-                        UI.toast(`Usuário ${username} removido.`, "success");
+                        await this.db.ref(`users/${uid}`).remove();
+                        Notify.show(`Acesso removido.`, "success");
                         this.renderUserList();
-                    } catch (e) {
-                        UI.toast("Erro ao excluir usuário.", "error");
+                    } catch (err) {
+                        Notify.show("Erro de permissão.", "error");
                     }
                 }
             },
 
-            // ===== PAINEL DE GESTÃO - RELATÓRIOS & HISTÓRICO =====
             async renderReportsList() {
-                const listEl = document.getElementById('reportsList');
-                listEl.innerHTML = '<tr><td colspan="5" style="text-align:center; color: var(--text-muted);">Carregando histórico...</td></tr>';
-                
+                const listEl = el('reportsList');
                 try {
                     const snap = await this.db.ref('reports').orderByChild('timestamp').limitToLast(50).once('value');
                     const reports = snap.val() || {};
                     let html = '';
                     
-                    // Ordenar decrescente (mais recente primeiro)
                     const sorted = Object.entries(reports).sort((a,b) => b[1].timestamp - a[1].timestamp);
                     
                     sorted.forEach(([key, r]) => {
-                        const dataObj = new Date(r.timestamp);
-                        const dataStr = `${dataObj.toLocaleDateString('pt-BR')} às ${dataObj.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'})}`;
+                        const date = new Date(r.timestamp);
                         html += `
                         <tr>
-                            <td>${dataStr}</td>
-                            <td>${r.depto} - ${r.area}</td>
-                            <td><span style="font-size: 12px;">${r.de_turno} ➔ ${r.para_turno}</span></td>
-                            <td><b>${r.autor}</b></td>
+                            <td>${date.toLocaleDateString('pt-BR')} às ${date.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'})}</td>
+                            <td>${Utils.escapeHTML(r.depto)} - ${Utils.escapeHTML(r.area)}</td>
+                            <td><span style="font-size: 12px;">${Utils.escapeHTML(r.de_turno)} ➔ ${Utils.escapeHTML(r.para_turno)}</span></td>
+                            <td><b>${Utils.escapeHTML(r.autorNome)}</b></td>
                             <td style="text-align: right;">
-                                <button class="btn-secondary btn-sm" onclick="App.visualizarRelatorioAdmin('${key}')">
-                                    <span class="material-icons-round" style="font-size: 16px;">visibility</span> Abrir
-                                </button>
+                                <button class="btn-secondary btn-sm" onclick="App.visualizarRelatorioAdmin('${key}')">Abrir</button>
                             </td>
-                        </tr>
-                        `;
+                        </tr>`;
                     });
-                    if(sorted.length === 0) html = '<tr><td colspan="5" style="text-align:center;">Nenhum relatório salvo ainda.</td></tr>';
+                    
+                    if (sorted.length === 0) html = '<tr><td colspan="5" style="text-align:center;">Nenhum relatório salvo.</td></tr>';
                     listEl.innerHTML = html;
-                } catch(e) {
-                    listEl.innerHTML = '<tr><td colspan="5" style="text-align:center; color: var(--danger);">Erro ao carregar histórico.</td></tr>';
+                } catch (err) {
+                    listEl.innerHTML = '<tr><td colspan="5" style="text-align:center; color: var(--danger);">Sem permissão para ler relatórios.</td></tr>';
                 }
             },
 
             async visualizarRelatorioAdmin(id) {
-                try {
-                    const snap = await this.db.ref('reports/' + id).once('value');
-                    if(!snap.exists()) return UI.toast("Relatório não encontrado.", "error");
-                    
-                    const fd = snap.val();
-                    this.renderizarVisualizacao(fd, false);
-                } catch(e) {
-                    UI.toast("Erro ao abrir relatório.", "error");
-                }
+                const snap = await this.db.ref(`reports/${id}`).once('value');
+                if (snap.exists()) this.renderizarVisualizacao(snap.val(), false);
             },
 
-            // Gatilho Automático: Segunda-feira às 8:30
-            verificarRelatorioSemanalAutomatico() {
-                const role = localStorage.getItem('currentRole');
-                if(role !== 'admin') return;
-
+            verificarRelatorioSemanal() {
+                if (this.userData.role !== 'admin') return;
+                
                 const now = new Date();
-                const day = now.getDay(); // 0 = Dom, 1 = Seg, etc.
-                const hours = now.getHours();
-                const minutes = now.getMinutes();
-
-                // Se for Segunda-Feira E for 08:30 ou mais tarde
-                if (day === 1 && (hours > 8 || (hours === 8 && minutes >= 30))) {
-                    const todayStr = now.toISOString().slice(0,10);
-                    
-                    // Checa se o relatório de hoje já foi gerado
+                const isMondayMorning = now.getDay() === 1 && (now.getHours() > 8 || (now.getHours() === 8 && now.getMinutes() >= 30));
+                
+                if (isMondayMorning) {
+                    const todayStr = now.toISOString().slice(0, 10);
                     this.db.ref('settings/lastWeeklyReport').once('value').then(snap => {
-                        const lastGenerated = snap.val();
-                        if(lastGenerated !== todayStr) {
-                            UI.toast("Gerando relatório semanal automático...", "info");
-                            this.gerarRelatorioSemanal().then(() => {
-                                this.db.ref('settings/lastWeeklyReport').set(todayStr);
-                            });
+                        if (snap.val() !== todayStr) {
+                            this.gerarRelatorioSemanal().then(() => this.db.ref('settings/lastWeeklyReport').set(todayStr));
                         }
                     });
                 }
@@ -1135,63 +924,36 @@ ${fd.geral}
 
             async gerarRelatorioSemanal() {
                 try {
-                    UI.toast("Buscando dados da última semana...", "info");
-                    
                     const seteDiasAtras = Date.now() - (7 * 24 * 60 * 60 * 1000);
                     const snap = await this.db.ref('reports').orderByChild('timestamp').startAt(seteDiasAtras).once('value');
                     const reports = snap.val() || {};
-                    
                     const sorted = Object.values(reports).sort((a,b) => a.timestamp - b.timestamp);
                     
-                    if(sorted.length === 0) {
-                        return UI.toast("Nenhum relatório registrado nos últimos 7 dias.", "warning");
-                    }
+                    if (sorted.length === 0) return Notify.show("Nenhum relatório na última semana.", "warning");
 
                     let corpo = "==========================================================\n";
                     corpo += "          RELATÓRIO SEMANAL DE TROCA DE TURNO - MAHLE\n";
                     corpo += "==========================================================\n";
-                    corpo += `Gerado em: ${new Date().toLocaleString('pt-BR')}\n`;
-                    corpo += `Total de registros no período: ${sorted.length}\n\n`;
-
-                    sorted.forEach(fd => {
-                        const dataRegistro = new Date(fd.timestamp).toLocaleString('pt-BR');
-                        corpo += `[${dataRegistro}] - DEPTO: ${fd.depto} (${fd.area})\n`;
-                        corpo += `Passagem: De ${fd.de_nome} (${fd.de_turno}) PARA ${fd.para_nome} (${fd.para_turno})\n`;
-                        corpo += `Registrado no sistema por: ${fd.autor}\n`;
+                    
+                    sorted.forEach(d => {
+                        corpo += `[${new Date(d.timestamp).toLocaleString('pt-BR')}] - DEPTO: ${d.depto}\n`;
+                        corpo += `Passagem: De ${d.de_nome} PARA ${d.para_nome}\n`;
+                        corpo += `PRODUÇÃO: ${d.situacao}\n\n`;
                         corpo += `----------------------------------------------------------\n`;
-                        corpo += `PRODUÇÃO: ${fd.situacao}\n\n`;
-                        corpo += `DESVIOS: ${fd.desvios}\n\n`;
-                        corpo += `PARADAS: ${fd.paradas}\n\n`;
-                        corpo += `RH / 5S: ${fd.trabalhistas} | ${fd.tpm}\n\n`;
-                        corpo += `GERAL: ${fd.geral}\n`;
-                        corpo += `==========================================================\n\n`;
                     });
 
-                    // Download do arquivo TXT localmente
                     const blob = new Blob([corpo], { type: 'text/plain;charset=utf-8' });
-                    const url = window.URL.createObjectURL(blob);
                     const a = document.createElement('a');
-                    a.style.display = 'none';
-                    a.href = url;
-                    a.download = `MAHLE_Relatorio_Semanal_${new Date().toISOString().slice(0,10)}.txt`;
-                    
-                    document.body.appendChild(a);
+                    a.href = window.URL.createObjectURL(blob);
+                    a.download = `MAHLE_Relatorio_${new Date().toISOString().slice(0,10)}.txt`;
                     a.click();
                     
-                    window.URL.revokeObjectURL(url);
-                    document.body.removeChild(a);
-                    
-                    UI.toast("Relatório Semanal gerado e baixado com sucesso!", "success");
-                } catch (e) {
-                    console.error(e);
-                    UI.toast("Erro ao gerar relatório semanal.", "error");
+                    Notify.show("Relatório Semanal baixado com sucesso!", "success");
+                } catch (err) {
+                    Notify.show("Erro ao gerar relatório semanal.", "error");
                 }
             }
         };
-
-        const styleSheet = document.createElement("style");
-        styleSheet.innerText = `@keyframes spin { 100% { transform: rotate(360deg); } }`;
-        document.head.appendChild(styleSheet);
 
         window.onload = () => App.init();
     </script>
