@@ -14,46 +14,23 @@
 
     <style>
         :root { 
-            --primary: #004b87; 
-            --primary-dark: #00335e; 
-            --secondary: #64748b; 
-            --secondary-dark: #475569; 
-            --warning: #f59e0b; 
-            --warning-dark: #d97706; 
-            --danger: #ef4444; 
-            --danger-dark: #b91c1c; 
-            --success: #10b981; 
-            --bg-color: #f1f5f9; 
-            --card-bg: #ffffff; 
-            --text-main: #1e293b; 
-            --text-muted: #64748b; 
-            --border: #e2e8f0; 
-            --input-bg: #f8fafc; 
+            --primary: #004b87; --primary-dark: #00335e; 
+            --secondary: #64748b; --secondary-dark: #475569; 
+            --warning: #f59e0b; --warning-dark: #d97706; 
+            --danger: #ef4444; --danger-dark: #b91c1c; 
+            --success: #10b981; --bg-color: #f1f5f9; 
+            --card-bg: #ffffff; --text-main: #1e293b; 
+            --text-muted: #64748b; --border: #e2e8f0; --input-bg: #f8fafc; 
         }
 
-        * { 
-            box-sizing: border-box; 
-            font-family: 'Inter', sans-serif; 
-            margin: 0; 
-            padding: 0; 
-        }
-
-        body { 
-            background: var(--bg-color); 
-            color: var(--text-main); 
-            transition: background 0.3s; 
-        }
-
+        * { box-sizing: border-box; font-family: 'Inter', sans-serif; margin: 0; padding: 0; }
+        body { background: var(--bg-color); color: var(--text-main); transition: background 0.3s; }
+        
         body.login-active { 
             background-image: linear-gradient(rgba(0, 30, 60, 0.85), rgba(0, 30, 60, 0.95)), url('fachada.jpg'); 
-            background-size: cover; 
-            background-position: center; 
-            background-repeat: no-repeat; 
-            background-attachment: fixed; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            min-height: 100vh; 
+            background-size: cover; background-position: center; 
+            background-repeat: no-repeat; background-attachment: fixed; 
+            display: flex; align-items: center; justify-content: center; min-height: 100vh; 
         }
 
         .app-container { max-width: 1000px; margin: 0 auto; padding: 20px; }
@@ -75,10 +52,16 @@
         
         .form-group { display: flex; flex-direction: column; gap: 6px; }
         label { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.3px; }
-        input, textarea, select { width: 100%; padding: 12px 16px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 14px; background: var(--input-bg); color: var(--text-main); transition: all 0.2s; font-weight: 500; }
+        
+        input, textarea, select { 
+            width: 100%; padding: 12px 16px; border: 1.5px solid var(--border); 
+            border-radius: 8px; font-size: 14px; background: var(--input-bg); 
+            color: var(--text-main); transition: all 0.2s; font-weight: 500; 
+        }
         select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; background-size: 16px; padding-right: 40px; cursor: pointer; }
         input:focus, textarea:focus, select:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 4px rgba(0, 75, 135, 0.1); background: #fff; }
         select:disabled { background-color: #e2e8f0; cursor: not-allowed; color: #94a3b8; }
+        .error-border { border-color: var(--danger) !important; background-color: #fef2f2 !important; }
         
         .btn-group { display: flex; gap: 12px; margin-top: 32px; }
         button { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 14px 24px; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 4px 6px rgba(0,0,0,0.1), 0 1px 3px rgba(0,0,0,0.08); }
@@ -161,11 +144,11 @@
                 </div>
 
                 <div class="form-group">
-                    <label>E-mail Corporativo</label>
+                    <label>E-mail ou usuário</label>
                     <input type="email" id="loginEmail" placeholder="joao.silva@mahle.com" autocapitalize="none">
                 </div>
                 <div class="form-group">
-                    <label>Senha de Segurança</label>
+                    <label>Senha</label>
                     <input type="password" id="loginPass" placeholder="••••••••">
                 </div>
                 <button class="btn-primary w-100" onclick="App.login()" id="btnLogin" style="margin-top: 8px;">
@@ -437,6 +420,12 @@
                 const div = document.createElement('div');
                 div.textContent = str || '';
                 return div.innerHTML;
+            },
+            formatDate(timestamp) {
+                return new Intl.DateTimeFormat('pt-BR', {
+                    day: '2-digit', month: '2-digit', year: 'numeric',
+                    hour: '2-digit', minute: '2-digit'
+                }).format(new Date(timestamp));
             }
         };
 
@@ -484,9 +473,6 @@
                 firebase.initializeApp(Config.firebase);
                 this.db = firebase.database();
                 
-                // Instância secundária para o painel admin registrar novos usuários sem sobrescrever a sessão local
-                this.secondaryApp = firebase.initializeApp(Config.firebase, "Secondary");
-
                 firebase.auth().onAuthStateChanged(async (user) => {
                     if (user) {
                         this.currentUser = user;
@@ -609,28 +595,28 @@
             },
 
             validateForm() {
-                const fields = ['f_data', 'f_depto', 'f_area', 'f_para_nome', 'f_de_nome', 'f_de_turno', 'f_para_turno', 'f_situacao', 'f_desvios', 'f_paradas', 'f_trabalhistas', 'f_tpm', 'f_geral'];
-                for (let id of fields) {
-                    const node = el(id);
-                    if (!node.value || node.value === '' || (node.value === 'N/A' && id !== 'f_area')) {
-                        node.focus();
-                        Notify.show("Preencha todos os campos obrigatórios.", "warning");
-                        return false;
+                let isValid = true;
+                document.querySelectorAll('#viewForm [required]').forEach(node => {
+                    if (!node.disabled && !node.value.trim()) {
+                        isValid = false;
+                        node.classList.add('error-border');
+                    } else {
+                        node.classList.remove('error-border');
                     }
-                }
-                return true;
+                });
+
+                if (!isValid) Notify.show("Preencha todos os campos obrigatórios.", "warning");
+                return isValid;
             },
 
             getFormData() {
-                const getVal = id => el(id).disabled ? "N/A" : el(id).value;
-                return {
-                    data: getVal('f_data'), depto: getVal('f_depto'), area: getVal('f_area'),
-                    de_nome: getVal('f_de_nome'), para_nome: getVal('f_para_nome'),
-                    de_turno: getVal('f_de_turno'), para_turno: getVal('f_para_turno'),
-                    situacao: getVal('f_situacao'), desvios: getVal('f_desvios'), 
-                    paradas: getVal('f_paradas'), trabalhistas: getVal('f_trabalhistas'), 
-                    tpm: getVal('f_tpm'), geral: getVal('f_geral')
-                };
+                const data = {};
+                document.querySelectorAll('#viewForm input, #viewForm select, #viewForm textarea').forEach(node => {
+                    if (node.id.startsWith('f_')) {
+                        data[node.id.replace('f_', '')] = node.disabled ? "N/A" : node.value;
+                    }
+                });
+                return data;
             },
 
             async salvarRelatorioBD() {
@@ -657,12 +643,28 @@
 ==== RELATÓRIO DE TROCA DE TURNO - MAHLE ====
 Data: ${d.data} | Departamento: ${d.depto}
 Área de Produção: ${d.area}
+
 [LIDERANÇA]
 De: ${d.de_nome} (${d.de_turno})
 Para: ${d.para_nome} (${d.para_turno})
 
 [SITUAÇÃO DA PRODUÇÃO]
 ${d.situacao}
+
+[DESVIOS DE PROCESSO]
+${d.desvios}
+
+[PARADAS (Quebras/Falta de Mat.)]
+${d.paradas}
+
+[QUESTÕES TRABALHISTAS]
+${d.trabalhistas}
+
+[TPM / 5S]
+${d.tpm}
+
+[OBSERVAÇÕES GERAIS]
+${d.geral}
                 `;
                 window.location.href = `mailto:${Config.emailDestino}?subject=${encodeURIComponent(assunto)}&body=${encodeURIComponent(corpo.trim())}`;
                 Notify.show("Salvo no sistema e e-mail aberto!", "success");
@@ -743,6 +745,8 @@ ${d.situacao}
                     el('f_de_turno').value = '';
                     el('f_para_turno').value = '';
                     
+                    document.querySelectorAll('.error-border').forEach(node => node.classList.remove('error-border'));
+                    
                     this.handleDeptoChange();
                     this.navigate('viewForm');
                 }
@@ -756,6 +760,8 @@ ${d.situacao}
                 if (!nome || !email || !pass) return Notify.show("Preencha todos os campos.", "warning");
 
                 try {
+                    this.secondaryApp = firebase.apps.find(app => app.name === 'Secondary') || firebase.initializeApp(Config.firebase, "Secondary");
+                    
                     const cred = await this.secondaryApp.auth().createUserWithEmailAndPassword(email, pass);
                     await this.db.ref(`users/${cred.user.uid}`).set({ nome, email, role: 'operator' });
                     await this.secondaryApp.auth().signOut();
@@ -767,7 +773,12 @@ ${d.situacao}
                     el('newPassword').value = '';
                     this.renderUserList(); 
                 } catch (err) {
-                    Notify.show(err.message, "error"); 
+                    const authErrors = {
+                        'auth/email-already-in-use': 'Este e-mail já está em uso.',
+                        'auth/weak-password': 'A senha deve ter no mínimo 6 caracteres.',
+                        'auth/invalid-email': 'Formato de e-mail inválido.'
+                    };
+                    Notify.show(authErrors[err.code] || "Erro ao criar usuário.", "error"); 
                 }
             },
 
@@ -802,11 +813,13 @@ ${d.situacao}
                 
                 try {
                     const snap = await this.db.ref('users').once('value');
-                    const users = snap.val() || {};
                     let html = '', countTotal = 0, countAdmin = 0, countOp = 0;
 
-                    Object.entries(users).forEach(([uid, u]) => {
+                    snap.forEach(child => {
+                        const uid = child.key;
+                        const u = child.val();
                         countTotal++;
+                        
                         const isAdmin = u.role === 'admin';
                         isAdmin ? countAdmin++ : countOp++;
                         const isMe = uid === this.currentUser.uid;
@@ -875,26 +888,27 @@ ${d.situacao}
                 const listEl = el('reportsList');
                 try {
                     const snap = await this.db.ref('reports').orderByChild('timestamp').limitToLast(50).once('value');
-                    const reports = snap.val() || {};
+                    const reports = [];
+                    
+                    snap.forEach(childSnap => {
+                        reports.unshift({ id: childSnap.key, ...childSnap.val() }); 
+                    });
+                    
                     let html = '';
-                    
-                    const sorted = Object.entries(reports).sort((a,b) => b[1].timestamp - a[1].timestamp);
-                    
-                    sorted.forEach(([key, r]) => {
-                        const date = new Date(r.timestamp);
+                    reports.forEach(r => {
                         html += `
                         <tr>
-                            <td>${date.toLocaleDateString('pt-BR')} às ${date.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'})}</td>
+                            <td>${Utils.formatDate(r.timestamp)}</td>
                             <td>${Utils.escapeHTML(r.depto)} - ${Utils.escapeHTML(r.area)}</td>
                             <td><span style="font-size: 12px;">${Utils.escapeHTML(r.de_turno)} ➔ ${Utils.escapeHTML(r.para_turno)}</span></td>
                             <td><b>${Utils.escapeHTML(r.autorNome)}</b></td>
                             <td style="text-align: right;">
-                                <button class="btn-secondary btn-sm" onclick="App.visualizarRelatorioAdmin('${key}')">Abrir</button>
+                                <button class="btn-secondary btn-sm" onclick="App.visualizarRelatorioAdmin('${r.id}')">Abrir</button>
                             </td>
                         </tr>`;
                     });
                     
-                    if (sorted.length === 0) html = '<tr><td colspan="5" style="text-align:center;">Nenhum relatório salvo.</td></tr>';
+                    if (reports.length === 0) html = '<tr><td colspan="5" style="text-align:center;">Nenhum relatório salvo.</td></tr>';
                     listEl.innerHTML = html;
                 } catch (err) {
                     listEl.innerHTML = '<tr><td colspan="5" style="text-align:center; color: var(--danger);">Sem permissão para ler relatórios.</td></tr>';
@@ -926,19 +940,20 @@ ${d.situacao}
                 try {
                     const seteDiasAtras = Date.now() - (7 * 24 * 60 * 60 * 1000);
                     const snap = await this.db.ref('reports').orderByChild('timestamp').startAt(seteDiasAtras).once('value');
-                    const reports = snap.val() || {};
-                    const sorted = Object.values(reports).sort((a,b) => a.timestamp - b.timestamp);
                     
-                    if (sorted.length === 0) return Notify.show("Nenhum relatório na última semana.", "warning");
+                    const reports = [];
+                    snap.forEach(child => { reports.push(child.val()); });
+                    
+                    if (reports.length === 0) return Notify.show("Nenhum relatório na última semana.", "warning");
 
                     let corpo = "==========================================================\n";
                     corpo += "          RELATÓRIO SEMANAL DE TROCA DE TURNO - MAHLE\n";
-                    corpo += "==========================================================\n";
+                    corpo += "==========================================================\n\n";
                     
-                    sorted.forEach(d => {
-                        corpo += `[${new Date(d.timestamp).toLocaleString('pt-BR')}] - DEPTO: ${d.depto}\n`;
+                    reports.forEach(d => {
+                        corpo += `[${Utils.formatDate(d.timestamp)}] - DEPTO: ${d.depto}\n`;
                         corpo += `Passagem: De ${d.de_nome} PARA ${d.para_nome}\n`;
-                        corpo += `PRODUÇÃO: ${d.situacao}\n\n`;
+                        corpo += `PRODUÇÃO:\n${d.situacao}\n\n`;
                         corpo += `----------------------------------------------------------\n`;
                     });
 
