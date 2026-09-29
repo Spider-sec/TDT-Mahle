@@ -117,7 +117,7 @@
                 <div style="text-align: center; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin: 4px 0 12px 0;">— Ou acesse com e-mail e senha —</div>
                 <div class="form-group">
                     <label>E-mail ou usuário</label>
-                    <input type="email" id="loginEmail" placeholder="joao.silva@mahle.com" autocapitalize="none">
+                    <input type="text" id="loginEmail" placeholder="joao.silva" autocapitalize="none">
                 </div>
                 <div class="form-group">
                     <label>Senha</label>
@@ -141,7 +141,7 @@
                         <span id="welcomeText"></span>
                     </div>
                     <div style="display: flex; gap: 12px;">
-                        <button id="btnAdmin" class="btn-secondary btn-sm hidden" onclick="App.navigate('viewAdmin')">
+                        <button id="btnAdmin" class="btn-secondary btn-sm hidden" onclick="App.nav('viewAdmin')">
                             <span class="material-icons-round" style="font-size: 16px;">dashboard</span> Gestão
                         </button>
                         <button class="btn-danger btn-sm" onclick="App.logout()">
@@ -224,7 +224,7 @@
             <div class="card">
                 <div class="header-top">
                     <div class="page-title"><span class="material-icons-round">dashboard</span> Painel de Controle</div>
-                    <button class="btn-secondary btn-sm" onclick="App.navigate('viewForm')"><span class="material-icons-round">arrow_back</span> Voltar</button>
+                    <button class="btn-secondary btn-sm" onclick="App.nav('viewForm')"><span class="material-icons-round">arrow_back</span> Voltar</button>
                 </div>
                 <div class="dashboard-stats">
                     <div class="stat-card"><div class="stat-value" id="statTotal">0</div><div class="stat-label">Total de Usuários</div></div>
@@ -347,8 +347,14 @@
             },
 
             async login() {
-                const m = $('loginEmail').value.trim(), p =$('loginPass').value;
+                let m = $('loginEmail').value.trim();
+                const p = $('loginPass').value;
                 if (!m || !p) return sys.show("Preencha dados.", "warning");
+                
+                if (!m.includes('@')) {
+                    m = m + '@mahle.com';
+                }
+
                 sys.load('btnLogin', true);
                 try { await firebase.auth().signInWithEmailAndPassword(m, p); } 
                 catch (e) { sys.show("Credenciais inválidas.", "error"); } 
