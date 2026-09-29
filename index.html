@@ -11,6 +11,8 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
 
     <style>
         :root { 
@@ -22,53 +24,39 @@
             --card-bg: #ffffff; --text-main: #1e293b; 
             --text-muted: #64748b; --border: #e2e8f0; --input-bg: #f8fafc; 
         }
-
         * { box-sizing: border-box; font-family: 'Inter', sans-serif; margin: 0; padding: 0; }
         body { background: var(--bg-color); color: var(--text-main); transition: background 0.3s; }
-        
         body.login-active { 
             background-image: linear-gradient(rgba(0, 30, 60, 0.85), rgba(0, 30, 60, 0.95)), url('fachada.jpg'); 
             background-size: cover; background-position: center; 
             background-repeat: no-repeat; background-attachment: fixed; 
             display: flex; align-items: center; justify-content: center; min-height: 100vh; 
         }
-
         .app-container { max-width: 1000px; margin: 0 auto; padding: 20px; }
         body.login-active .app-container { padding: 0; width: 100%; max-width: 420px; }
-        
         .card { background: var(--card-bg); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); padding: 32px; margin-bottom: 24px; border: 1px solid rgba(255,255,255,0.5); }
         .hidden { display: none !important; }
-        
         .mahle-logo { font-family: 'Arial Black', Impact, sans-serif; font-size: 38px; font-weight: 900; color: var(--primary); letter-spacing: -2px; margin: 0; line-height: 1; text-transform: uppercase; }
         .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 2px solid var(--border); }
         .page-title { color: var(--text-main); font-size: 22px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
         .page-title .material-icons-round { color: var(--primary); }
         .section-header { background: var(--primary); color: #fff; padding: 12px 16px; font-size: 13px; font-weight: 600; border-radius: 6px; margin: 32px 0 16px 0; letter-spacing: 0.5px; text-transform: uppercase; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 6px rgba(0,75,135,0.2); }
-        
         .form-grid { display: grid; gap: 16px; }
         .grid-col-1 { grid-template-columns: 1fr; }
         .grid-col-2 { grid-template-columns: 1fr 1fr; }
         .grid-col-4 { grid-template-columns: repeat(4, 1fr); }
-        
         .form-group { display: flex; flex-direction: column; gap: 6px; }
         label { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.3px; }
-        
-        input, textarea, select { 
-            width: 100%; padding: 12px 16px; border: 1.5px solid var(--border); 
-            border-radius: 8px; font-size: 14px; background: var(--input-bg); 
-            color: var(--text-main); transition: all 0.2s; font-weight: 500; 
-        }
+        input, textarea, select { width: 100%; padding: 12px 16px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 14px; background: var(--input-bg); color: var(--text-main); transition: all 0.2s; font-weight: 500; }
         select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; background-size: 16px; padding-right: 40px; cursor: pointer; }
         input:focus, textarea:focus, select:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 4px rgba(0, 75, 135, 0.1); background: #fff; }
         select:disabled { background-color: #e2e8f0; cursor: not-allowed; color: #94a3b8; }
         .error-border { border-color: var(--danger) !important; background-color: #fef2f2 !important; }
-        
         .btn-group { display: flex; gap: 12px; margin-top: 32px; }
         button { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 14px 24px; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 4px 6px rgba(0,0,0,0.1), 0 1px 3px rgba(0,0,0,0.08); }
         button:hover { transform: translateY(-2px); box-shadow: 0 7px 14px rgba(0,0,0,0.15), 0 3px 6px rgba(0,0,0,0.1); }
         button:active { transform: translateY(1px); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
         button:disabled { opacity: 0.7; cursor: not-allowed; transform: none; box-shadow: none; }
-        
         .btn-primary { background: var(--primary); color: #fff; }
         .btn-primary:hover { background: var(--primary-dark); }
         .btn-secondary { background: var(--secondary); color: #fff; }
@@ -81,68 +69,52 @@
         .btn-nfc:hover { background: #0369a1; }
         .btn-sm { padding: 8px 16px; font-size: 12px; }
         .w-100 { width: 100%; }
-        
         .dashboard-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
         .stat-card { background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border: 1px solid var(--border); border-radius: 8px; padding: 16px; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         .stat-value { font-size: 24px; font-weight: 800; color: var(--primary); margin-bottom: 4px; }
         .stat-label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
-        
         .admin-panel { display: grid; gap: 24px; }
         .admin-card { background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 20px; }
         .full-width { grid-column: 1 / -1; }
-        
         .user-table-wrapper { overflow-x: auto; background: #fff; border: 1px solid var(--border); border-radius: 8px; }
         .user-table { width: 100%; border-collapse: collapse; text-align: left; }
         .user-table th { background: #f1f5f9; padding: 12px 16px; font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; border-bottom: 2px solid var(--border); }
         .user-table td { padding: 16px; border-bottom: 1px solid var(--border); font-size: 14px; font-weight: 500; vertical-align: middle; }
         .user-table tr:last-child td { border-bottom: none; }
-        
         .badge { font-size: 11px; padding: 4px 8px; border-radius: 6px; font-weight: 700; text-transform: uppercase; display: inline-flex; align-items: center; gap: 4px; }
         .badge-admin { background: #e0f2fe; color: #0284c7; }
         .badge-op { background: #f1f5f9; color: var(--secondary); }
-        
         .presentation-view { background: #fff; padding: 24px; border-radius: 8px; border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
         .p-block { margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid #f1f5f9; }
         .p-block:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
         .p-label { font-size: 11px; color: var(--primary); text-transform: uppercase; font-weight: 800; margin-bottom: 6px; }
         .p-value { font-size: 15px; font-weight: 500; color: var(--text-main); white-space: pre-wrap; line-height: 1.5; }
-        
         #toast-container { position: fixed; top: 24px; right: 24px; left: 24px; display: flex; flex-direction: column; gap: 10px; z-index: 9999; pointer-events: none; align-items: flex-end; }
         .toast { background: #1e293b; color: #fff; padding: 16px 24px; border-radius: 8px; font-size: 14px; font-weight: 600; box-shadow: 0 10px 25px rgba(0,0,0,0.2); opacity: 0; transform: translateX(50px); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; align-items: center; gap: 12px; max-width: 400px; }
         .toast.show { opacity: 1; transform: translateX(0); }
         .toast.success { border-left: 6px solid var(--success); }
         .toast.error { border-left: 6px solid var(--danger); }
         .toast.warning { border-left: 6px solid var(--warning); }
-
         @keyframes spin { 100% { transform: rotate(360deg); } }
         .icon-spin { animation: spin 1s linear infinite; }
-
         @media (min-width: 768px) { .app-container { padding: 40px 20px; } #toast-container { left: auto; } .grid-md-2 { grid-template-columns: repeat(2, 1fr); } .grid-md-4 { grid-template-columns: repeat(4, 1fr); } .span-2 { grid-column: span 2; } .span-4 { grid-column: span 4; } .admin-panel { grid-template-columns: 350px 1fr; align-items: start; } }
         @media (max-width: 767px) { .dashboard-stats { grid-template-columns: 1fr; gap: 12px; } }
     </style>
 </head>
 <body>
-
     <div id="toast-container"></div>
-    
     <div class="app-container">
         
-        <!-- TELA DE LOGIN -->
         <div id="viewLogin" class="card hidden" style="margin: 0;">
             <div style="text-align: center; margin-bottom: 32px;">
                 <div class="mahle-logo">MAHLE</div>
                 <div style="color: var(--text-muted); font-size: 14px; font-weight: 500; margin-top: 8px;">Sistema de Troca de Turno</div>
             </div>
-            
             <div class="form-grid grid-col-1">
                 <button class="btn-nfc w-100" onclick="App.loginNFC()" id="btnNfcLogin" style="padding: 16px; margin-bottom: 12px;">
                     <span class="material-icons-round" style="font-size: 22px;">nfc</span> Entrar com Crachá (RFID)
                 </button>
-                
-                <div style="text-align: center; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin: 4px 0 12px 0;">
-                    — Ou acesse com e-mail e senha —
-                </div>
-
+                <div style="text-align: center; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin: 4px 0 12px 0;">— Ou acesse com e-mail e senha —</div>
                 <div class="form-group">
                     <label>E-mail ou usuário</label>
                     <input type="email" id="loginEmail" placeholder="joao.silva@mahle.com" autocapitalize="none">
@@ -157,14 +129,12 @@
             </div>
         </div>
 
-        <!-- TELA DO FORMULÁRIO -->
         <div id="viewForm" class="hidden">
             <div class="card">
                 <div class="header-top">
                     <div class="page-title"><span class="material-icons-round">assignment</span> Relatório de Turno</div>
                     <div class="mahle-logo" style="font-size: 28px;">MAHLE</div>
                 </div>
-                
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; background: #f8fafc; padding: 12px 16px; border-radius: 8px; border: 1px solid var(--border);">
                     <div style="font-weight: 600; color: var(--primary); display: flex; align-items: center; gap: 8px;">
                         <span class="material-icons-round" style="font-size: 18px;">account_circle</span>
@@ -179,12 +149,8 @@
                         </button>
                     </div>
                 </div>
-                
                 <div class="form-grid grid-col-1 grid-md-4">
-                    <div class="form-group span-2">
-                        <label>Data do Turno *</label>
-                        <input type="date" id="f_data" required>
-                    </div>
+                    <div class="form-group span-2"><label>Data do Turno *</label><input type="date" id="f_data" required></div>
                     <div class="form-group span-2">
                         <label>Departamento *</label>
                         <select id="f_depto" onchange="App.handleDeptoChange()" required>
@@ -196,26 +162,10 @@
                             <option value="Spin On">Spin On</option>
                         </select>
                     </div>
-                    
-                    <div class="form-group span-2">
-                        <label>Área de Produção *</label>
-                        <select id="f_area" disabled required>
-                            <option value="N/A" selected>Bloqueado</option>
-                        </select>
-                    </div>
-                    <div class="form-group span-2">
-                        <label>Para (Nome Próximo Turno) *</label>
-                        <input type="text" id="f_para_nome" placeholder="Nome de quem vai receber" required>
-                    </div>
-                    
-                    <div class="section-header span-4">
-                        <span class="material-icons-round" style="font-size: 18px;">swap_horiz</span> Liderança e Turnos
-                    </div>
-                    
-                    <div class="form-group span-2">
-                        <label>De (Seu Nome) *</label>
-                        <input type="text" id="f_de_nome" required>
-                    </div>
+                    <div class="form-group span-2"><label>Área de Produção *</label><select id="f_area" disabled required><option value="N/A" selected>Bloqueado</option></select></div>
+                    <div class="form-group span-2"><label>Para (Nome Próximo Turno) *</label><input type="text" id="f_para_nome" placeholder="Nome de quem vai receber" required></div>
+                    <div class="section-header span-4"><span class="material-icons-round" style="font-size: 18px;">swap_horiz</span> Liderança e Turnos</div>
+                    <div class="form-group span-2"><label>De (Seu Nome) *</label><input type="text" id="f_de_nome" required></div>
                     <div class="form-group span-2">
                         <label>De (Seu Turno) *</label>
                         <select id="f_de_turno" required>
@@ -235,154 +185,81 @@
                         </select>
                     </div>
                 </div>
-
                 <div class="form-group" style="margin-top: 24px;">
-                    <div class="section-header" style="margin-top: 0;">
-                        <span class="material-icons-round" style="font-size: 18px;">precision_manufacturing</span> Situação da Produção *
-                    </div>
+                    <div class="section-header" style="margin-top: 0;"><span class="material-icons-round" style="font-size: 18px;">precision_manufacturing</span> Situação da Produção *</div>
                     <textarea id="f_situacao" rows="4" placeholder="Relate o status geral das máquinas..." required></textarea>
                 </div>
-
                 <div class="form-grid grid-col-1 grid-md-2" style="margin-top: 24px;">
-                    <div class="form-group">
-                        <div class="section-header" style="margin-top: 0;"><span class="material-icons-round" style="font-size: 18px;">warning</span> Desvios de Processo *</div>
-                        <textarea id="f_desvios" rows="3" placeholder="Relate os desvios aqui..." required></textarea>
-                    </div>
-                    <div class="form-group">
-                        <div class="section-header" style="margin-top: 0;"><span class="material-icons-round" style="font-size: 18px;">build_circle</span> Paradas (Quebras/Falta de Mat.) *</div>
-                        <textarea id="f_paradas" rows="3" placeholder="Relate as paradas de máquina..." required></textarea>
-                    </div>
-                    <div class="form-group">
-                        <div class="section-header" style="margin-top: 0;"><span class="material-icons-round" style="font-size: 18px;">groups</span> Questões Trabalhistas *</div>
-                        <textarea id="f_trabalhistas" rows="3" placeholder="Faltas, atestados, atrasos..." required></textarea>
-                    </div>
-                    <div class="form-group">
-                        <div class="section-header" style="margin-top: 0;"><span class="material-icons-round" style="font-size: 18px;">cleaning_services</span> TPM / 5S *</div>
-                        <textarea id="f_tpm" rows="3" placeholder="Status de limpeza, organização..." required></textarea>
-                    </div>
-                    <div class="form-group span-2">
-                        <div class="section-header" style="margin-top: 0;"><span class="material-icons-round" style="font-size: 18px;">notes</span> Observações Gerais *</div>
-                        <textarea id="f_geral" rows="3" placeholder="Informações adicionais..." required></textarea>
-                    </div>
+                    <div class="form-group"><div class="section-header" style="margin-top: 0;"><span class="material-icons-round" style="font-size: 18px;">warning</span> Desvios de Processo *</div><textarea id="f_desvios" rows="3" placeholder="Relate os desvios aqui..." required></textarea></div>
+                    <div class="form-group"><div class="section-header" style="margin-top: 0;"><span class="material-icons-round" style="font-size: 18px;">build_circle</span> Paradas (Quebras/Falta de Mat.) *</div><textarea id="f_paradas" rows="3" placeholder="Relate as paradas de máquina..." required></textarea></div>
+                    <div class="form-group"><div class="section-header" style="margin-top: 0;"><span class="material-icons-round" style="font-size: 18px;">groups</span> Questões Trabalhistas *</div><textarea id="f_trabalhistas" rows="3" placeholder="Faltas, atestados, atrasos..." required></textarea></div>
+                    <div class="form-group"><div class="section-header" style="margin-top: 0;"><span class="material-icons-round" style="font-size: 18px;">cleaning_services</span> TPM / 5S *</div><textarea id="f_tpm" rows="3" placeholder="Status de limpeza, organização..." required></textarea></div>
+                    <div class="form-group span-2"><div class="section-header" style="margin-top: 0;"><span class="material-icons-round" style="font-size: 18px;">notes</span> Observações Gerais *</div><textarea id="f_geral" rows="3" placeholder="Informações adicionais..." required></textarea></div>
                 </div>
-
                 <div class="btn-group">
-                    <button class="btn-primary w-100 hidden" id="btnSalvarOp" onclick="App.gerarApresentacao()">
-                        <span class="material-icons-round">save</span> Salvar para Apresentação
-                    </button>
-                    <button class="btn-primary w-100 hidden" id="btnEnviarAdmin" onclick="App.enviarRelatorio()">
-                        <span class="material-icons-round">send</span> Enviar Relatório por E-mail
-                    </button>
+                    <button class="btn-primary w-100 hidden" id="btnSalvarOp" onclick="App.gerarApresentacao()"><span class="material-icons-round">save</span> Salvar para Apresentação</button>
+                    <button class="btn-primary w-100 hidden" id="btnEnviarAdmin" onclick="App.gerarPdfEnviar()"><span class="material-icons-round">picture_as_pdf</span> Gerar PDF e Compartilhar</button>
                 </div>
             </div>
         </div>
 
-        <!-- TELA DE APRESENTAÇÃO -->
         <div id="viewPresentation" class="hidden">
             <div class="card">
                 <div class="header-top">
                     <div class="page-title"><span class="material-icons-round">assignment_turned_in</span> Resumo do Turno</div>
                     <div class="mahle-logo" style="font-size: 28px;">MAHLE</div>
                 </div>
-                
                 <div id="presentationAlert" style="background: #e0f2fe; color: #0284c7; padding: 16px; border-radius: 8px; margin-bottom: 24px; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 12px; border: 1px solid #bae6fd;">
-                    <span class="material-icons-round" style="font-size: 24px;">info</span> 
-                    Apresente esta tela ao responsável pelo próximo turno.
+                    <span class="material-icons-round" style="font-size: 24px;">info</span> Apresente esta tela ao responsável pelo próximo turno.
                 </div>
-
                 <div class="presentation-view" id="presentationContent"></div>
-
                 <div class="btn-group">
-                    <button class="btn-secondary w-100" id="btnBackPresentation" onclick="App.voltarDaApresentacao()">
-                        <span class="material-icons-round">arrow_back</span> Voltar
-                    </button>
-                    <button class="btn-primary w-100" id="btnNewTurno" onclick="App.limparFormulario()">
-                        <span class="material-icons-round">add_circle</span> Iniciar Novo Turno
-                    </button>
+                    <button class="btn-secondary w-100" id="btnBackPresentation" onclick="App.voltarDaApresentacao()"><span class="material-icons-round">arrow_back</span> Voltar</button>
+                    <button class="btn-primary w-100" id="btnNewTurno" onclick="App.limparFormulario()"><span class="material-icons-round">add_circle</span> Iniciar Novo Turno</button>
                 </div>
             </div>
         </div>
 
-        <!-- TELA ADMIN -->
         <div id="viewAdmin" class="hidden">
             <div class="card">
                 <div class="header-top">
                     <div class="page-title"><span class="material-icons-round">dashboard</span> Painel de Controle</div>
-                    <button class="btn-secondary btn-sm" onclick="App.navigate('viewForm')">
-                        <span class="material-icons-round">arrow_back</span> Voltar
-                    </button>
+                    <button class="btn-secondary btn-sm" onclick="App.navigate('viewForm')"><span class="material-icons-round">arrow_back</span> Voltar</button>
                 </div>
-
                 <div class="dashboard-stats">
                     <div class="stat-card"><div class="stat-value" id="statTotal">0</div><div class="stat-label">Total de Usuários</div></div>
                     <div class="stat-card"><div class="stat-value" id="statAdmins" style="color: #0284c7;">0</div><div class="stat-label">Administradores</div></div>
                     <div class="stat-card"><div class="stat-value" id="statOps" style="color: var(--secondary);">0</div><div class="stat-label">Operadores</div></div>
                 </div>
-
                 <div class="admin-panel">
                     <div class="admin-card">
-                        <div class="page-title" style="font-size: 16px; margin-bottom: 20px;">
-                            <span class="material-icons-round" style="font-size: 20px;">person_add</span> Cadastrar Usuário
-                        </div>
+                        <div class="page-title" style="font-size: 16px; margin-bottom: 20px;"><span class="material-icons-round" style="font-size: 20px;">person_add</span> Cadastrar Usuário</div>
                         <div class="form-grid grid-col-1">
-                            <div class="form-group">
-                                <label>Nome de Exibição</label>
-                                <input type="text" id="newUserName" placeholder="Ex: João Silva">
-                            </div>
-                            <div class="form-group">
-                                <label>E-mail (Login)</label>
-                                <input type="email" id="newUserEmail" placeholder="joao.silva@mahle.com">
-                            </div>
-                            <div class="form-group">
-                                <label>Senha Provisória</label>
-                                <input type="password" id="newPassword" placeholder="Crie uma senha forte">
-                            </div>
-                            <button class="btn-primary" onclick="App.criarUsuario()" style="margin-top: 8px;">
-                                <span class="material-icons-round" style="font-size: 18px;">person_add</span> Criar Acesso
-                            </button>
+                            <div class="form-group"><label>Nome de Exibição</label><input type="text" id="newUserName" placeholder="Ex: João Silva"></div>
+                            <div class="form-group"><label>E-mail (Login)</label><input type="email" id="newUserEmail" placeholder="joao.silva@mahle.com"></div>
+                            <div class="form-group"><label>Senha Provisória</label><input type="password" id="newPassword" placeholder="Crie uma senha forte"></div>
+                            <button class="btn-primary" onclick="App.criarUsuario()" style="margin-top: 8px;"><span class="material-icons-round" style="font-size: 18px;">person_add</span> Criar Acesso</button>
                         </div>
                     </div>
-
                     <div>
                         <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 16px;">
-                            <div class="page-title" style="font-size: 16px;">
-                                <span class="material-icons-round" style="font-size: 20px;">manage_accounts</span> Equipe Cadastrada
-                            </div>
+                            <div class="page-title" style="font-size: 16px;"><span class="material-icons-round" style="font-size: 20px;">manage_accounts</span> Equipe Cadastrada</div>
                         </div>
                         <div class="user-table-wrapper">
                             <table class="user-table">
-                                <thead>
-                                    <tr>
-                                        <th>Colaborador</th>
-                                        <th>Nível</th>
-                                        <th style="text-align: right;">Ações</th>
-                                    </tr>
-                                </thead>
+                                <thead><tr><th>Colaborador</th><th>Nível</th><th style="text-align: right;">Ações</th></tr></thead>
                                 <tbody id="usersList"></tbody>
                             </table>
                         </div>
                     </div>
-
                     <div class="admin-card full-width" style="margin-top: 16px;">
                         <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 16px;">
-                            <div class="page-title" style="font-size: 16px;">
-                                <span class="material-icons-round" style="font-size: 20px;">history_edu</span> Histórico de Trocas de Turno
-                            </div>
-                            <button class="btn-primary btn-sm" onclick="App.gerarRelatorioSemanal()">
-                                <span class="material-icons-round" style="font-size: 16px;">calendar_month</span> Gerar Relatório Semanal
-                            </button>
+                            <div class="page-title" style="font-size: 16px;"><span class="material-icons-round" style="font-size: 20px;">history_edu</span> Histórico de Trocas de Turno</div>
+                            <button class="btn-primary btn-sm" onclick="App.gerarPdfSemanal()"><span class="material-icons-round" style="font-size: 16px;">picture_as_pdf</span> PDF Semanal</button>
                         </div>
                         <div class="user-table-wrapper" style="max-height: 400px; overflow-y: auto;">
                             <table class="user-table">
-                                <thead>
-                                    <tr>
-                                        <th>Data / Hora Registro</th>
-                                        <th>Depto / Área</th>
-                                        <th>Turnos</th>
-                                        <th>Responsável</th>
-                                        <th style="text-align: right;">Ações</th>
-                                    </tr>
-                                </thead>
+                                <thead><tr><th>Data / Hora Registro</th><th>Depto / Área</th><th>Turnos</th><th>Responsável</th><th style="text-align: right;">Ações</th></tr></thead>
                                 <tbody id="reportsList"></tbody>
                             </table>
                         </div>
@@ -393,580 +270,333 @@
     </div>
 
     <script>
-        const el = id => document.getElementById(id);
+        const $ = id => document.getElementById(id);
+        const $$ = sel => document.querySelectorAll(sel);
 
-        const Config = {
-            firebase: {
-                apiKey: "AIzaSyARfglCAGb4ITePr4ede_jBaTJpTEHrxnk",
-                authDomain: "tdt-mahle.firebaseapp.com",
-                databaseURL: "https://tdt-mahle-default-rtdb.firebaseio.com",
-                projectId: "tdt-mahle",
-                storageBucket: "tdt-mahle.firebasestorage.app",
-                messagingSenderId: "802974828568",
-                appId: "1:802974828568:web:84f6a42464159574d65b6d"
-            },
-            emailDestino: "supervisao@mahle.com",
+        const cfg = {
+            fb: { apiKey: "AIzaSyARfglCAGb4ITePr4ede_jBaTJpTEHrxnk", authDomain: "tdt-mahle.firebaseapp.com", databaseURL: "https://tdt-mahle-default-rtdb.firebaseio.com", projectId: "tdt-mahle", storageBucket: "tdt-mahle.firebasestorage.app", messagingSenderId: "802974828568", appId: "1:802974828568:web:84f6a42464159574d65b6d" },
+            mail: "supervisao@mahle.com",
             nfcSalt: "Mahle_NFC_Sec_2026!@" 
         };
 
-        const Utils = {
-            async hashNFC(serialNumber) {
-                const msgBuffer = new TextEncoder().encode(Config.nfcSalt + serialNumber);
-                const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-                const hashArray = Array.from(new Uint8Array(hashBuffer));
-                return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        const u = {
+            async hash(sn) {
+                const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(cfg.nfcSalt + sn));
+                return Array.from(new Uint8Array(b)).map(x => x.toString(16).padStart(2, '0')).join('');
             },
-            escapeHTML(str) {
-                const div = document.createElement('div');
-                div.textContent = str || '';
-                return div.innerHTML;
-            },
-            formatDate(timestamp) {
-                return new Intl.DateTimeFormat('pt-BR', {
-                    day: '2-digit', month: '2-digit', year: 'numeric',
-                    hour: '2-digit', minute: '2-digit'
-                }).format(new Date(timestamp));
+            esc(s) { const d = document.createElement('div'); d.textContent = s || ''; return d.innerHTML; },
+            fmtDt(ts) { return new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }).format(new Date(ts)); },
+            err(e) { 
+                const m = { 'auth/email-already-in-use': 'E-mail em uso.', 'auth/weak-password': 'Mínimo 6 chars.', 'auth/invalid-email': 'E-mail inválido.' };
+                sys.show(m[e.code] || e.message || "Erro interno.", "error"); 
             }
         };
 
-        const Notify = {
+        const sys = {
             show(msg, type = 'info') {
-                const container = el('toast-container');
-                const elToast = document.createElement('div');
-                elToast.className = `toast ${type}`;
-                
-                const icon = type === 'success' ? 'check_circle' : 
-                            (type === 'error' ? 'warning' : 
-                            (type === 'warning' ? 'error_outline' : 'info'));
-                            
-                elToast.innerHTML = `<span class="material-icons-round">${icon}</span> <span>${msg}</span>`;
-                container.appendChild(elToast);
-                
-                requestAnimationFrame(() => elToast.classList.add('show'));
-                
-                setTimeout(() => {
-                    elToast.classList.remove('show');
-                    setTimeout(() => elToast.remove(), 300);
-                }, 3500);
+                const c = $('toast-container'), t = document.createElement('div');
+                t.className = `toast ${type}`;
+                const icn = type === 'success' ? 'check_circle' : (type === 'error' ? 'warning' : (type === 'warning' ? 'error_outline' : 'info'));
+                t.innerHTML = `<span class="material-icons-round">${icn}</span> <span>${msg}</span>`;
+                c.appendChild(t);
+                requestAnimationFrame(() => t.classList.add('show'));
+                setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 3500);
             },
-            setLoading(btnId, isLoading) {
-                const btn = el(btnId);
-                if (isLoading) {
-                    btn.dataset.original = btn.innerHTML;
-                    btn.innerHTML = `<span class="material-icons-round icon-spin">autorenew</span> Aguarde...`;
-                    btn.disabled = true;
-                } else {
-                    btn.innerHTML = btn.dataset.original;
-                    btn.disabled = false;
-                }
+            load(id, state) {
+                const b = $(id);
+                if (state) { b.dataset.o = b.innerHTML; b.innerHTML = `<span class="material-icons-round icon-spin">autorenew</span>`; b.disabled = true; } 
+                else { b.innerHTML = b.dataset.o; b.disabled = false; }
             }
         };
 
         const App = {
-            db: null,
-            currentUser: null,
-            userData: null,
-            viewingHistory: false,
-            secondaryApp: null,
+            db: null, user: null, ctx: null, vHist: false, sec: null,
 
             init() {
-                firebase.initializeApp(Config.firebase);
+                firebase.initializeApp(cfg.fb);
                 this.db = firebase.database();
-                
-                firebase.auth().onAuthStateChanged(async (user) => {
-                    if (user) {
-                        this.currentUser = user;
+                firebase.auth().onAuthStateChanged(async usr => {
+                    if (usr) {
+                        this.user = usr;
                         try {
-                            const snap = await this.db.ref(`users/${user.uid}`).once('value');
-                            this.userData = snap.val() || { nome: user.email, role: 'operator' };
-                            
-                            el('welcomeText').innerText = this.userData.nome;
-                            el('f_de_nome').value = this.userData.nome;
-                            
-                            this.configureRoleUI(this.userData.role);
-                            this.verificarRelatorioSemanal();
-                            this.navigate('viewForm');
-                        } catch (err) {
-                            Notify.show("Erro ao buscar permissões.", "error");
-                        }
+                            const s = await this.db.ref(`users/${usr.uid}`).once('value');
+                            this.ctx = s.val() || { nome: usr.email, role: 'operator' };
+                            $('welcomeText').innerText = this.ctx.nome;
+                            $('f_de_nome').value = this.ctx.nome;
+                            this.setRole();
+                            this.chkWeekly();
+                            this.nav('viewForm');
+                        } catch (e) { u.err(e); }
                     } else {
-                        this.currentUser = null;
-                        this.userData = null;
-                        this.navigate('viewLogin');
+                        this.user = this.ctx = null;
+                        this.nav('viewLogin');
                     }
                 });
             },
 
-            configureRoleUI(role) {
-                const isAdmin = role === 'admin';
-                el('btnAdmin').classList.toggle('hidden', !isAdmin);
-                el('btnEnviarAdmin').classList.toggle('hidden', !isAdmin);
-                el('btnSalvarOp').classList.toggle('hidden', isAdmin);
+            setRole() {
+                const adm = this.ctx.role === 'admin';
+                $('btnAdmin').classList.toggle('hidden', !adm);
+                $('btnEnviarAdmin').classList.toggle('hidden', !adm);$('btnSalvarOp').classList.toggle('hidden', adm);
             },
 
-            navigate(viewId) {
-                ['viewLogin', 'viewForm', 'viewAdmin', 'viewPresentation'].forEach(id => {
-                    el(id).classList.add('hidden');
-                });
-                
-                el(viewId).classList.remove('hidden');
-                document.body.classList.toggle('login-active', viewId === 'viewLogin');
-                
-                if (viewId === 'viewAdmin') {
-                    this.renderUserList();
-                    this.renderReportsList();
-                }
+            nav(id) {
+                ['viewLogin', 'viewForm', 'viewAdmin', 'viewPresentation'].forEach(v => $(v).classList.add('hidden'));$(id).classList.remove('hidden');
+                document.body.classList.toggle('login-active', id === 'viewLogin');
+                if (id === 'viewAdmin') { this.loadUsers(); this.loadRpts(); }
             },
 
             async login() {
-                const email = el('loginEmail').value.trim();
-                const pass = el('loginPass').value;
-                
-                if (!email || !pass) return Notify.show("Preencha e-mail e senha.", "warning");
-
-                Notify.setLoading('btnLogin', true);
-                try {
-                    await firebase.auth().signInWithEmailAndPassword(email, pass);
-                } catch (err) {
-                    Notify.show("E-mail ou senha incorretos.", "error");
-                } finally {
-                    Notify.setLoading('btnLogin', false);
-                }
+                const m = $('loginEmail').value.trim(), p =$('loginPass').value;
+                if (!m || !p) return sys.show("Preencha dados.", "warning");
+                sys.load('btnLogin', true);
+                try { await firebase.auth().signInWithEmailAndPassword(m, p); } 
+                catch (e) { sys.show("Credenciais inválidas.", "error"); } 
+                finally { sys.load('btnLogin', false); }
             },
 
             async loginNFC() {
-                if (!('NDEFReader' in window)) return Notify.show("NFC não suportado neste aparelho.", "warning");
-                
-                Notify.show("Aproxime o crachá da traseira do celular...", "info");
-
+                if (!('NDEFReader' in window)) return sys.show("NFC indísponivel.", "warning");
+                sys.show("Aproxime o crachá...", "info");
                 try {
                     const ndef = new NDEFReader();
                     await ndef.scan();
-                    
-                    ndef.addEventListener("reading", async ({ serialNumber }) => {
-                        if (!serialNumber) return Notify.show("Falha na leitura.", "error");
-                        
-                        const hashedNfc = await Utils.hashNFC(serialNumber);
-                        const nfcSnap = await this.db.ref(`nfc_tags/${hashedNfc}`).once('value');
-                        
-                        if (nfcSnap.exists()) {
-                            const emailVinculado = nfcSnap.val();
-                            const senha = prompt(`Crachá reconhecido (${emailVinculado}).\nDigite sua senha de segurança para confirmar:`);
-                            
-                            if (senha) {
-                                Notify.show("Autenticando...", "info");
-                                try {
-                                    await firebase.auth().signInWithEmailAndPassword(emailVinculado, senha);
-                                } catch (e) {
-                                    Notify.show("Senha incorreta.", "error");
-                                }
-                            } else {
-                                Notify.show("Login cancelado.", "warning");
-                            }
-                        } else {
-                            Notify.show("Crachá não cadastrado no sistema.", "error");
-                        }
+                    ndef.addEventListener("reading", async ({ serialNumber: sn }) => {
+                        if (!sn) return sys.show("Falha.", "error");
+                        const hs = await u.hash(sn);
+                        const s = await this.db.ref(`nfc_tags/${hs}`).once('value');
+                        if (s.exists()) {
+                            const pwd = prompt(`Crachá reconhecido (${s.val()}). Senha:`);
+                            if (pwd) {
+                                sys.show("Autenticando...", "info");
+                                try { await firebase.auth().signInWithEmailAndPassword(s.val(), pwd); } 
+                                catch (e) { sys.show("Senha incorreta.", "error"); }
+                            } else sys.show("Cancelado.", "warning");
+                        } else sys.show("Crachá não vinculado.", "error");
                     }, { once: true });
-                } catch (err) {
-                    Notify.show("Erro ao ativar NFC.", "error");
-                }
+                } catch (e) { u.err(e); }
             },
 
-            logout() {
-                firebase.auth().signOut().then(() => window.location.reload());
-            },
+            logout() { firebase.auth().signOut().then(() => window.location.reload()); },
             
             handleDeptoChange() {
-                const depto = el('f_depto').value;
-                const area = el('f_area');
-                
-                if (depto === 'Injetora') {
-                    area.disabled = false;
-                    area.innerHTML = `
-                        <option value="" disabled selected>Selecione a área...</option>
-                        <option value="Lado A">Lado A</option>
-                        <option value="Lado B">Lado B</option>
-                        <option value="Lado D">Lado D</option>
-                    `;
+                const d = $('f_depto').value, a =$('f_area');
+                if (d === 'Injetora') {
+                    a.disabled = false;
+                    a.innerHTML = `<option value="" disabled selected>Selecione a área...</option><option value="Lado A">Lado A</option><option value="Lado B">Lado B</option><option value="Lado D">Lado D</option>`;
                 } else {
-                    area.disabled = true;
-                    area.innerHTML = `<option value="N/A" selected>Bloqueado</option>`;
+                    a.disabled = true;
+                    a.innerHTML = `<option value="N/A" selected>Bloqueado</option>`;
                 }
             },
 
-            validateForm() {
-                let isValid = true;
-                document.querySelectorAll('#viewForm [required]').forEach(node => {
-                    if (!node.disabled && !node.value.trim()) {
-                        isValid = false;
-                        node.classList.add('error-border');
-                    } else {
-                        node.classList.remove('error-border');
-                    }
+            val() {
+                let ok = true;
+                $$('#viewForm [required]').forEach(n => {                     if (!n.disabled && !n.value.trim()) { ok = false; n.classList.add('error-border'); }                      else n.classList.remove('error-border');                 });                 if (!ok) sys.show("Preencha todos os campos obrigatórios.", "warning");                 return ok;             },              getD() {                 const d = {};                 $$
+('#viewForm input, #viewForm select, #viewForm textarea').forEach(n => {
+                    if (n.id.startsWith('f_')) d[n.id.replace('f_', '')] = n.disabled ? "N/A" : n.value;
                 });
-
-                if (!isValid) Notify.show("Preencha todos os campos obrigatórios.", "warning");
-                return isValid;
+                return d;
             },
 
-            getFormData() {
-                const data = {};
-                document.querySelectorAll('#viewForm input, #viewForm select, #viewForm textarea').forEach(node => {
-                    if (node.id.startsWith('f_')) {
-                        data[node.id.replace('f_', '')] = node.disabled ? "N/A" : node.value;
-                    }
-                });
-                return data;
+            async saveBd() {
+                const d = this.getD();
+                d.timestamp = Date.now(); d.autorNome = this.ctx.nome; d.authorId = this.user.uid;
+                try { await this.db.ref('reports').push(d); return true; } 
+                catch (e) { u.err(e); return false; }
             },
 
-            async salvarRelatorioBD() {
-                const data = this.getFormData();
-                data.timestamp = Date.now();
-                data.autorNome = this.userData.nome;
-                data.authorId = this.currentUser.uid;
+            async gerarPdfEnviar() {
+                if (!this.val() || !await this.saveBd()) return;
+                sys.show("Gerando PDF...", "info");
+                const d = this.getD(), { jsPDF } = window.jspdf, doc = new jsPDF('p', 'pt', 'a4');
                 
-                try {
-                    await this.db.ref('reports').push(data);
-                    return true;
-                } catch (err) {
-                    Notify.show("Erro de permissão ao salvar.", "error");
-                    return false;
+                doc.setFont("helvetica", "bold"); doc.setFontSize(18); doc.setTextColor(0, 75, 135);
+                doc.text("MAHLE - Troca de Turno", 40, 40);
+                doc.setFontSize(10); doc.setFont("helvetica", "normal"); doc.setTextColor(100, 116, 139);
+                doc.text(`Data: ${d.data} | Resp: ${this.ctx.nome}`, 40, 55);
+
+                doc.autoTable({
+                    startY: 70, theme: 'plain', styles: { cellPadding: 2, fontSize: 10 },
+                    columnStyles: { 0: { fontStyle: 'bold', textColor: [0, 75, 135], cellWidth: 150 } },
+                    body: [
+                        ['Depto/Área:', `${d.depto} - ${d.area}`],
+                        ['De:', `${d.de_nome} (${d.de_turno})`],
+                        ['Para:', `${d.para_nome} (${d.para_turno})`]
+                    ]
+                });
+
+                let cy = doc.lastAutoTable.finalY + 20;
+                const addSct = (t, c) => {
+                    if (cy > 750) { doc.addPage(); cy = 40; }
+                    doc.setFont("helvetica", "bold"); doc.setFontSize(11); doc.setTextColor(0, 75, 135);
+                    doc.text(t, 40, cy); cy += 15;
+                    doc.setFont("helvetica", "normal"); doc.setFontSize(10); doc.setTextColor(30, 41, 59);
+                    const sp = doc.splitTextToSize(c || 'N/A', 515);
+                    doc.text(sp, 40, cy); cy += (sp.length * 12) + 15;
+                };
+
+                addSct("PRODUÇÃO", d.situacao); addSct("DESVIOS", d.desvios); addSct("PARADAS", d.paradas);
+                addSct("RH", d.trabalhistas); addSct("5S", d.tpm); addSct("GERAL", d.geral);
+
+                const fn = `Turno_${d.data}_${d.depto}.pdf`, blb = doc.output('blob'), f = new File([blb], fn, { type: "application/pdf" }), subj = `Relatório - ${d.data} (${d.depto})`;
+
+                if (navigator.canShare && navigator.canShare({ files: [f] })) {
+                    try { await navigator.share({ files: [f], title: subj, text: 'Relatório em anexo.' }); sys.show("Compartilhado!", "success"); } 
+                    catch (e) { console.log(e); }
+                } else {
+                    doc.save(fn);
+                    window.location.href = `mailto:${cfg.mail}?subject=${encodeURIComponent(subj)}&body=${encodeURIComponent("Anexe o PDF gerado.")}`;
+                    sys.show("PDF salvo. Anexe ao e-mail.", "success");
                 }
-            },
-            
-            async enviarRelatorio() {
-                if (!this.validateForm() || !await this.salvarRelatorioBD()) return;
-
-                const d = this.getFormData();
-                const assunto = `Relatório de Troca de Turno - ${d.data} (${d.depto})`;
-                const corpo = `
-==== RELATÓRIO DE TROCA DE TURNO - MAHLE ====
-Data: ${d.data} | Departamento: ${d.depto}
-Área de Produção: ${d.area}
-
-[LIDERANÇA]
-De: ${d.de_nome} (${d.de_turno})
-Para: ${d.para_nome} (${d.para_turno})
-
-[SITUAÇÃO DA PRODUÇÃO]
-${d.situacao}
-
-[DESVIOS DE PROCESSO]
-${d.desvios}
-
-[PARADAS (Quebras/Falta de Mat.)]
-${d.paradas}
-
-[QUESTÕES TRABALHISTAS]
-${d.trabalhistas}
-
-[TPM / 5S]
-${d.tpm}
-
-[OBSERVAÇÕES GERAIS]
-${d.geral}
-                `;
-                window.location.href = `mailto:${Config.emailDestino}?subject=${encodeURIComponent(assunto)}&body=${encodeURIComponent(corpo.trim())}`;
-                Notify.show("Salvo no sistema e e-mail aberto!", "success");
             },
 
             async gerarApresentacao() {
-                if (!this.validateForm() || !await this.salvarRelatorioBD()) return;
-                this.renderizarVisualizacao(this.getFormData(), true);
-                Notify.show("Relatório salvo e pronto para apresentação.", "success");
+                if (!this.val() || !await this.saveBd()) return;
+                this.render(this.getD(), true);
+                sys.show("Salvo.", "success");
             },
 
-            renderizarVisualizacao(data, isNew) {
-                const eHTML = Utils.escapeHTML;
-                
-                const html = `
+            render(d, n) {
+                $('presentationContent').innerHTML = `
                     <div class="form-grid grid-col-2" style="margin-bottom: 24px;">
-                        <div>
-                            <div class="p-label">Data do Turno</div>
-                            <div class="p-value">${eHTML(data.data)}</div>
-                        </div>
-                        <div>
-                            <div class="p-label">Departamento / Área</div>
-                            <div class="p-value">${eHTML(data.depto)} - ${eHTML(data.area)}</div>
-                        </div>
+                        <div><div class="p-label">Data</div><div class="p-value">${u.esc(d.data)}</div></div>
+                        <div><div class="p-label">Depto/Área</div><div class="p-value">${u.esc(d.depto)} - ${u.esc(d.area)}</div></div>
                     </div>
-                    
-                    <div class="p-block">
-                        <div class="p-label">Passagem de Turno</div>
-                        <div class="p-value">
-                            De: <b>${eHTML(data.de_nome)}</b> (${eHTML(data.de_turno)})<br>
-                            Para: <b>${eHTML(data.para_nome)}</b> (${eHTML(data.para_turno)})
-                        </div>
-                    </div>
-                    
-                    <div class="p-block"><div class="p-label">Situação da Produção</div><div class="p-value">${eHTML(data.situacao)}</div></div>
-                    <div class="p-block"><div class="p-label">Desvios de Processo</div><div class="p-value">${eHTML(data.desvios)}</div></div>
-                    <div class="p-block"><div class="p-label">Paradas / Quebras</div><div class="p-value">${eHTML(data.paradas)}</div></div>
-                    
-                    <div class="p-block">
-                        <div class="p-label">Questões Trabalhistas & TPM / 5S</div>
-                        <div class="p-value"><b>RH:</b> ${eHTML(data.trabalhistas)}<br><br><b>5S:</b> ${eHTML(data.tpm)}</div>
-                    </div>
-                    
-                    <div class="p-block" style="border:none;">
-                        <div class="p-label">Geral</div>
-                        <div class="p-value">${eHTML(data.geral)}</div>
-                    </div>
-                    
-                    <div style="font-size:11px; color:var(--text-muted); text-align:right; border-top: 1px solid var(--border); padding-top: 12px; margin-top: 12px;">
-                        Registrado por: <b>${eHTML(data.autorNome || this.userData.nome)}</b>
-                    </div>
+                    <div class="p-block"><div class="p-label">Passagem</div><div class="p-value">De: <b>${u.esc(d.de_nome)}</b> (${u.esc(d.de_turno)})<br>Para: <b>${u.esc(d.para_nome)}</b> (${u.esc(d.para_turno)})</div></div>
+                    <div class="p-block"><div class="p-label">Produção</div><div class="p-value">${u.esc(d.situacao)}</div></div>
+                    <div class="p-block"><div class="p-label">Desvios</div><div class="p-value">${u.esc(d.desvios)}</div></div>
+                    <div class="p-block"><div class="p-label">Paradas</div><div class="p-value">${u.esc(d.paradas)}</div></div>
+                    <div class="p-block"><div class="p-label">RH & 5S</div><div class="p-value"><b>RH:</b> ${u.esc(d.trabalhistas)}<br><br><b>5S:</b> ${u.esc(d.tpm)}</div></div>
+                    <div class="p-block" style="border:none;"><div class="p-label">Geral</div><div class="p-value">${u.esc(d.geral)}</div></div>
+                    <div style="font-size:11px; color:var(--text-muted); text-align:right; border-top: 1px solid var(--border); padding-top: 12px; margin-top: 12px;">Por: <b>${u.esc(d.autorNome || this.ctx.nome)}</b></div>
                 `;
-
-                el('presentationContent').innerHTML = html;
-                
-                this.viewingHistory = !isNew;
-                el('presentationAlert').classList.toggle('hidden', !isNew);
-                el('btnNewTurno').classList.toggle('hidden', !isNew);
-                this.navigate('viewPresentation');
+                this.vHist = !n;
+                $('presentationAlert').classList.toggle('hidden', !n);$('btnNewTurno').classList.toggle('hidden', !n);
+                this.nav('viewPresentation');
             },
 
-            voltarDaApresentacao() {
-                if (this.viewingHistory) {
-                    this.viewingHistory = false;
-                    this.navigate('viewAdmin');
-                } else {
-                    this.navigate('viewForm');
-                }
-            },
+            voltarDaApresentacao() { this.vHist ? this.nav('viewAdmin') : this.nav('viewForm'); this.vHist = false; },
 
             limparFormulario() {
-                if (confirm("Deseja iniciar um novo turno?")) {
-                    document.querySelectorAll('#viewForm input, #viewForm textarea, #viewForm select').forEach(node => {
-                        if (node.id !== 'f_de_nome') node.value = '';
-                    });
-                    
-                    el('f_depto').value = '';
-                    el('f_de_turno').value = '';
-                    el('f_para_turno').value = '';
-                    
-                    document.querySelectorAll('.error-border').forEach(node => node.classList.remove('error-border'));
-                    
-                    this.handleDeptoChange();
-                    this.navigate('viewForm');
-                }
+                if (!confirm("Novo turno?")) return;
+                $$('#viewForm input, #viewForm textarea, #viewForm select').forEach(n => { if (n.id !== 'f_de_nome') n.value = ''; });                 $$
+('.error-border').forEach(n => n.classList.remove('error-border'));
+                this.handleDeptoChange(); this.nav('viewForm');
             },
 
             async criarUsuario() {
-                const nome = el('newUserName').value.trim();
-                const email = el('newUserEmail').value.trim();
-                const pass = el('newPassword').value;
-
-                if (!nome || !email || !pass) return Notify.show("Preencha todos os campos.", "warning");
-
+                const nm = $('newUserName').value.trim(), em = $('newUserEmail').value.trim(), pw =$('newPassword').value;
+                if (!nm || !em || !pw) return sys.show("Preencha tudo.", "warning");
                 try {
-                    this.secondaryApp = firebase.apps.find(app => app.name === 'Secondary') || firebase.initializeApp(Config.firebase, "Secondary");
-                    
-                    const cred = await this.secondaryApp.auth().createUserWithEmailAndPassword(email, pass);
-                    await this.db.ref(`users/${cred.user.uid}`).set({ nome, email, role: 'operator' });
-                    await this.secondaryApp.auth().signOut();
-
-                    Notify.show(`Usuário ${nome} criado!`, "success");
-                    
-                    el('newUserName').value = '';
-                    el('newUserEmail').value = '';
-                    el('newPassword').value = '';
-                    this.renderUserList(); 
-                } catch (err) {
-                    const authErrors = {
-                        'auth/email-already-in-use': 'Este e-mail já está em uso.',
-                        'auth/weak-password': 'A senha deve ter no mínimo 6 caracteres.',
-                        'auth/invalid-email': 'Formato de e-mail inválido.'
-                    };
-                    Notify.show(authErrors[err.code] || "Erro ao criar usuário.", "error"); 
-                }
+                    this.sec = firebase.apps.find(a => a.name === 'Sec') || firebase.initializeApp(cfg.fb, "Sec");
+                    const cr = await this.sec.auth().createUserWithEmailAndPassword(em, pw);
+                    await this.db.ref(`users/${cr.user.uid}`).set({ nome: nm, email: em, role: 'operator' });
+                    await this.sec.auth().signOut();
+                    sys.show(`Usuário criado.`, "success");
+                    ['newUserName', 'newUserEmail', 'newPassword'].forEach(i => $(i).value = '');
+                    this.loadUsers(); 
+                } catch (e) { u.err(e); }
             },
 
-            async cadastrarNFC(uid, userEmail) {
-                if (!('NDEFReader' in window)) return Notify.show("Sem suporte a NFC.", "warning");
-                
-                Notify.show(`Aproxime o crachá para vincular a ${userEmail}...`, "info");
-
+            async cadastrarNFC(uid, em) {
+                if (!('NDEFReader' in window)) return sys.show("NFC indísponivel.", "warning");
+                sys.show(`Aproxime crachá para ${em}...`, "info");
                 try {
                     const ndef = new NDEFReader();
                     await ndef.scan();
-                    
-                    ndef.addEventListener("reading", async ({ serialNumber }) => {
-                        if (!serialNumber) return Notify.show("Falha ao ler crachá.", "error");
-                        
-                        const hashedNfc = await Utils.hashNFC(serialNumber);
-                        
+                    ndef.addEventListener("reading", async ({ serialNumber: sn }) => {
+                        if (!sn) return sys.show("Falha.", "error");
                         await this.db.ref(`users/${uid}/hasNfc`).set(true);
-                        await this.db.ref(`nfc_tags/${hashedNfc}`).set(userEmail);
-                        
-                        Notify.show(`Crachá vinculado!`, "success");
-                        this.renderUserList();
+                        await this.db.ref(`nfc_tags/${await u.hash(sn)}`).set(em);
+                        sys.show(`Crachá vinculado.`, "success");
+                        this.loadUsers();
                     }, { once: true }); 
-                } catch (err) {
-                    Notify.show("Erro ao ler crachá.", "error");
-                }
+                } catch (e) { u.err(e); }
             },
 
-            async renderUserList() {
-                const listEl = el('usersList');
-                listEl.innerHTML = '<tr><td colspan="3" style="text-align:center; color: var(--text-muted);">Carregando equipe...</td></tr>';
-                
+            async loadUsers() {
+                const lst = $('usersList'); lst.innerHTML = '<tr><td colspan="3" align="center">Carregando...</td></tr>';
                 try {
-                    const snap = await this.db.ref('users').once('value');
-                    let html = '', countTotal = 0, countAdmin = 0, countOp = 0;
-
-                    snap.forEach(child => {
-                        const uid = child.key;
-                        const u = child.val();
-                        countTotal++;
-                        
-                        const isAdmin = u.role === 'admin';
-                        isAdmin ? countAdmin++ : countOp++;
-                        const isMe = uid === this.currentUser.uid;
-                        
-                        const actionBtns = `
-                            <button class="btn-nfc btn-sm" title="Vincular Crachá" style="padding: 6px; min-width: 32px;" onclick="App.cadastrarNFC('${uid}', '${u.email}')">
-                                <span class="material-icons-round" style="font-size: 16px;">${u.hasNfc ? 'nfc' : 'add_card'}</span>
-                            </button>
-                            <button class="btn-secondary btn-sm" title="Mudar Nível" style="padding: 6px; min-width: 32px;" onclick="App.toggleRole('${uid}', '${u.role}')" ${isMe ? 'disabled' : ''}>
-                                <span class="material-icons-round" style="font-size: 16px;">${isAdmin ? 'arrow_downward' : 'arrow_upward'}</span>
-                            </button>
-                            <button class="btn-danger btn-sm" title="Excluir Usuário" style="padding: 6px; min-width: 32px;" onclick="App.deleteUser('${uid}')" ${isMe ? 'disabled' : ''}>
-                                <span class="material-icons-round" style="font-size: 16px;">delete</span>
-                            </button>
+                    const s = await this.db.ref('users').once('value');
+                    let h = '', tt = 0, ad = 0, op = 0;
+                    s.forEach(c => {
+                        const id = c.key, usr = c.val(), isAd = usr.role === 'admin', isMe = id === this.user.uid;
+                        tt++; isAd ? ad++ : op++;
+                        const bts = `
+                            <button class="btn-nfc btn-sm" style="padding:6px;min-width:32px" onclick="App.cadastrarNFC('${id}','${usr.email}')"><span class="material-icons-round" style="font-size:16px">${usr.hasNfc ? 'nfc' : 'add_card'}</span></button>
+                            <button class="btn-secondary btn-sm" style="padding:6px;min-width:32px" onclick="App.toggleRole('${id}','${usr.role}')" ${isMe ? 'disabled' : ''}><span class="material-icons-round" style="font-size:16px">${isAd ? 'arrow_downward' : 'arrow_upward'}</span></button>
+                            <button class="btn-danger btn-sm" style="padding:6px;min-width:32px" onclick="App.deleteUser('${id}')" ${isMe ? 'disabled' : ''}><span class="material-icons-round" style="font-size:16px">delete</span></button>
                         `;
-
-                        html += `
-                        <tr>
-                            <td>
-                                <div style="display:flex; align-items:center; gap:8px;">
-                                    <span class="material-icons-round" style="font-size: 20px; color: var(--secondary);">account_circle</span>
-                                    <div>
-                                        <div style="font-weight: 600;">${Utils.escapeHTML(u.nome)}</div>
-                                        <div style="font-size: 11px; color: var(--text-muted);">${Utils.escapeHTML(u.email)}</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td><span class="badge ${isAdmin ? 'badge-admin' : 'badge-op'}"><span class="material-icons-round" style="font-size: 14px;">${isAdmin ? 'shield' : 'engineering'}</span> ${isAdmin ? 'Admin' : 'Op'}</span></td>
-                            <td style="text-align: right; display: flex; justify-content: flex-end; gap: 6px;">${actionBtns}</td>
-                        </tr>`;
+                        h += `<tr><td><div style="display:flex;align-items:center;gap:8px"><span class="material-icons-round" style="font-size:20px;color:var(--secondary)">account_circle</span><div><div style="font-weight:600">${u.esc(usr.nome)}</div><div style="font-size:11px;color:var(--text-muted)">${u.esc(usr.email)}</div></div></div></td><td><span class="badge ${isAd ? 'badge-admin' : 'badge-op'}">${isAd ? 'Admin' : 'Op'}</span></td><td style="text-align:right;display:flex;justify-content:flex-end;gap:6px">${bts}</td></tr>`;
                     });
-                    
-                    el('statTotal').innerText = countTotal;
-                    el('statAdmins').innerText = countAdmin;
-                    el('statOps').innerText = countOp;
-                    listEl.innerHTML = html;
-                } catch (err) {
-                    listEl.innerHTML = '<tr><td colspan="3" style="text-align:center; color: var(--danger);">Erro de permissão.</td></tr>';
-                }
+                    $('statTotal').innerText = tt; $('statAdmins').innerText = ad; $('statOps').innerText = op;
+                    lst.innerHTML = h;
+                } catch (e) { lst.innerHTML = '<tr><td colspan="3" align="center" style="color:red">Erro permissão</td></tr>'; }
             },
 
-            async toggleRole(uid, currentRole) {
-                const newRole = currentRole === 'admin' ? 'operator' : 'admin';
+            async toggleRole(id, cr) {
+                try { await this.db.ref(`users/${id}/role`).set(cr === 'admin' ? 'operator' : 'admin'); this.loadUsers(); } 
+                catch (e) { u.err(e); }
+            },
+
+            async deleteUser(id) {
+                if (!confirm(`Remover acesso?`)) return;
+                try { await this.db.ref(`users/${id}`).remove(); this.loadUsers(); } 
+                catch (e) { u.err(e); }
+            },
+
+            async loadRpts() {
+                const lst = $('reportsList');
                 try {
-                    await this.db.ref(`users/${uid}/role`).set(newRole);
-                    Notify.show(`Permissões atualizadas!`, "success");
-                    this.renderUserList();
-                } catch (err) {
-                    Notify.show("Erro ao alterar permissão.", "error");
+                    const s = await this.db.ref('reports').orderByChild('timestamp').limitToLast(50).once('value'), r = [];
+                    s.forEach(c => { r.unshift({ id: c.key, ...c.val() }); });
+                    let h = '';
+                    r.forEach(x => h += `<tr><td>${u.fmtDt(x.timestamp)}</td><td>${u.esc(x.depto)} - ${u.esc(x.area)}</td><td><span style="font-size:12px">${u.esc(x.de_turno)} ➔ ${u.esc(x.para_turno)}</span></td><td><b>${u.esc(x.autorNome)}</b></td><td style="text-align:right"><button class="btn-secondary btn-sm" onclick="App.viewRpt('${x.id}')">Abrir</button></td></tr>`);
+                    lst.innerHTML = r.length ? h : '<tr><td colspan="5" align="center">Vazio.</td></tr>';
+                } catch (e) { lst.innerHTML = '<tr><td colspan="5" align="center" style="color:red">Erro leitura</td></tr>'; }
+            },
+
+            async viewRpt(id) {
+                const s = await this.db.ref(`reports/${id}`).once('value');
+                if (s.exists()) this.render(s.val(), false);
+            },
+
+            chkWeekly() {
+                if (this.ctx.role !== 'admin') return;
+                const d = new Date();
+                if (d.getDay() === 1 && (d.getHours() > 8 || (d.getHours() === 8 && d.getMinutes() >= 30))) {
+                    const ts = d.toISOString().slice(0, 10);
+                    this.db.ref('settings/lastWeeklyReport').once('value').then(s => {
+                        if (s.val() !== ts) this.gerarPdfSemanal().then(() => this.db.ref('settings/lastWeeklyReport').set(ts));
+                    });
                 }
             },
 
-            async deleteUser(uid) {
-                if (confirm(`Desativar o acesso deste usuário ao banco de dados?`)) {
-                    try {
-                        await this.db.ref(`users/${uid}`).remove();
-                        Notify.show(`Acesso removido.`, "success");
-                        this.renderUserList();
-                    } catch (err) {
-                        Notify.show("Erro de permissão.", "error");
-                    }
-                }
-            },
-
-            async renderReportsList() {
-                const listEl = el('reportsList');
+            async gerarPdfSemanal() {
                 try {
-                    const snap = await this.db.ref('reports').orderByChild('timestamp').limitToLast(50).once('value');
-                    const reports = [];
-                    
-                    snap.forEach(childSnap => {
-                        reports.unshift({ id: childSnap.key, ...childSnap.val() }); 
-                    });
-                    
-                    let html = '';
-                    reports.forEach(r => {
-                        html += `
-                        <tr>
-                            <td>${Utils.formatDate(r.timestamp)}</td>
-                            <td>${Utils.escapeHTML(r.depto)} - ${Utils.escapeHTML(r.area)}</td>
-                            <td><span style="font-size: 12px;">${Utils.escapeHTML(r.de_turno)} ➔ ${Utils.escapeHTML(r.para_turno)}</span></td>
-                            <td><b>${Utils.escapeHTML(r.autorNome)}</b></td>
-                            <td style="text-align: right;">
-                                <button class="btn-secondary btn-sm" onclick="App.visualizarRelatorioAdmin('${r.id}')">Abrir</button>
-                            </td>
-                        </tr>`;
-                    });
-                    
-                    if (reports.length === 0) html = '<tr><td colspan="5" style="text-align:center;">Nenhum relatório salvo.</td></tr>';
-                    listEl.innerHTML = html;
-                } catch (err) {
-                    listEl.innerHTML = '<tr><td colspan="5" style="text-align:center; color: var(--danger);">Sem permissão para ler relatórios.</td></tr>';
-                }
-            },
+                    sys.show("Gerando PDF Semanal...", "info");
+                    const s = await this.db.ref('reports').orderByChild('timestamp').startAt(Date.now() - 604800000).once('value'), r = [];
+                    s.forEach(c => { r.push(c.val()); });
+                    if (!r.length) return sys.show("Sem relatórios.", "warning");
 
-            async visualizarRelatorioAdmin(id) {
-                const snap = await this.db.ref(`reports/${id}`).once('value');
-                if (snap.exists()) this.renderizarVisualizacao(snap.val(), false);
-            },
+                    const { jsPDF } = window.jspdf, doc = new jsPDF('l', 'pt', 'a4');
+                    doc.setFontSize(16); doc.setFont("helvetica", "bold"); doc.setTextColor(0, 75, 135);
+                    doc.text("MAHLE - Resumo Semanal", 40, 40);
+                    doc.setFontSize(10); doc.setFont("helvetica", "normal"); doc.setTextColor(100, 116, 139);
+                    doc.text(`Gerado: ${new Date().toLocaleString('pt-BR')}`, 40, 55);
 
-            verificarRelatorioSemanal() {
-                if (this.userData.role !== 'admin') return;
-                
-                const now = new Date();
-                const isMondayMorning = now.getDay() === 1 && (now.getHours() > 8 || (now.getHours() === 8 && now.getMinutes() >= 30));
-                
-                if (isMondayMorning) {
-                    const todayStr = now.toISOString().slice(0, 10);
-                    this.db.ref('settings/lastWeeklyReport').once('value').then(snap => {
-                        if (snap.val() !== todayStr) {
-                            this.gerarRelatorioSemanal().then(() => this.db.ref('settings/lastWeeklyReport').set(todayStr));
-                        }
-                    });
-                }
-            },
-
-            async gerarRelatorioSemanal() {
-                try {
-                    const seteDiasAtras = Date.now() - (7 * 24 * 60 * 60 * 1000);
-                    const snap = await this.db.ref('reports').orderByChild('timestamp').startAt(seteDiasAtras).once('value');
-                    
-                    const reports = [];
-                    snap.forEach(child => { reports.push(child.val()); });
-                    
-                    if (reports.length === 0) return Notify.show("Nenhum relatório na última semana.", "warning");
-
-                    let corpo = "==========================================================\n";
-                    corpo += "          RELATÓRIO SEMANAL DE TROCA DE TURNO - MAHLE\n";
-                    corpo += "==========================================================\n\n";
-                    
-                    reports.forEach(d => {
-                        corpo += `[${Utils.formatDate(d.timestamp)}] - DEPTO: ${d.depto}\n`;
-                        corpo += `Passagem: De ${d.de_nome} PARA ${d.para_nome}\n`;
-                        corpo += `PRODUÇÃO:\n${d.situacao}\n\n`;
-                        corpo += `----------------------------------------------------------\n`;
+                    doc.autoTable({
+                        startY: 70, theme: 'grid',
+                        head: [['Data', 'Depto', 'Passagem', 'Produção', 'Desvios', 'Paradas']],
+                        body: r.map(x => [u.fmtDt(x.timestamp), `${x.depto}\n${x.area}`, `${x.de_nome}\n➔ ${x.para_nome}`, x.situacao, x.desvios || '-', x.paradas || '-']),
+                        headStyles: { fillColor: [0, 75, 135], fontSize: 9 }, styles: { fontSize: 8, cellPadding: 4, valign: 'middle' },
+                        columnStyles: { 0: { cellWidth: 70 }, 1: { cellWidth: 70 }, 2: { cellWidth: 90 }, 3: { cellWidth: 220 } }
                     });
 
-                    const blob = new Blob([corpo], { type: 'text/plain;charset=utf-8' });
-                    const a = document.createElement('a');
-                    a.href = window.URL.createObjectURL(blob);
-                    a.download = `MAHLE_Relatorio_${new Date().toISOString().slice(0,10)}.txt`;
-                    a.click();
-                    
-                    Notify.show("Relatório Semanal baixado com sucesso!", "success");
-                } catch (err) {
-                    Notify.show("Erro ao gerar relatório semanal.", "error");
-                }
+                    doc.save(`MAHLE_Semanal_${new Date().toISOString().slice(0,10)}.pdf`);
+                    sys.show("Baixado.", "success");
+                } catch (e) { u.err(e); }
             }
         };
 
